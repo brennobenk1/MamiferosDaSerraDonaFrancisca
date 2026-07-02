@@ -1176,14 +1176,28 @@
 /* ===========================================================
    DADOS DAS ESPÉCIES
    -----------------------------------------------------------
-   Para publicar uma ilustração, adicione no repositório do
-   GitHub um arquivo em:  /Ilustracoes/<nome-do-arquivo>.png
-   e referencie esse nome exato no campo "arquivo" abaixo.
-   Enquanto o arquivo não existir, o card mostra um selo
+   As ilustrações NÃO são mais amarradas manualmente por um
+   campo "arquivo". Em vez disso, ao carregar a página, o site
+   lista automaticamente os arquivos da pasta /Ilustracoes no
+   GitHub e casa cada espécie com um arquivo cujo nome (sem a
+   extensão, ignorando acentos/maiúsculas/hífens) seja IDÊNTICO
+   ao nome científico OU ao nome popular da espécie.
+
+   Ou seja: para publicar uma ilustração, basta subir o arquivo
+   na pasta Ilustracoes com o nome exatamente igual a um dos
+   dois — por exemplo, para a Anta-brasileira (Tapirus terrestris):
+     "Tapirus terrestris.png"   ou   "Anta-brasileira.png"
+   Nada precisa ser editado aqui no código. Enquanto não houver
+   um arquivo com nome correspondente, o card mostra um selo
    "ilustração em produção" no lugar da imagem.
    =========================================================== */
 
-const GITHUB_RAW_BASE = "https://raw.githubusercontent.com/brennobenk1/MamiferosDaSerraDonaFrancisca/main/Ilustracoes/";
+const GITHUB_OWNER = "brennobenk1";
+const GITHUB_REPO  = "MamiferosDaSerraDonaFrancisca";
+const GITHUB_BRANCH = "main";
+const ILLUSTRATIONS_DIR = "Ilustracoes";
+const GITHUB_RAW_BASE = `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/${GITHUB_BRANCH}/${ILLUSTRATIONS_DIR}/`;
+const GITHUB_CONTENTS_API = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${ILLUSTRATIONS_DIR}?ref=${GITHUB_BRANCH}`;
 
 const LOREM = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua, habitando na mata da Serra Dona Francisca.";
 
@@ -1201,24 +1215,24 @@ const GROUPS = {
 };
 
 const SPECIES = [
-  { nome:"Anta-brasileira", cientifico:"Tapirus terrestris", grupo:"ungulados", arquivo:"anta.png" },
+  { nome:"Anta-brasileira", cientifico:"Tapirus terrestris", grupo:"ungulados" },
   { nome:"Cuíca-graciosa", cientifico:"Gracilinanus agilis", grupo:"marsupiais" },
-  { nome:"Caxinguelê", cientifico:"Sciurus aestuans", grupo:"roedores", arquivo:"Caxinguele.png" },
-  { nome:"Cachorro-vinagre", cientifico:"Speothos venaticus", grupo:"canideos", arquivo:"Cachorro vinagre.png" },
-  { nome:"Gambá-orelha-branca", cientifico:"Didelphis albiventris", grupo:"marsupiais", arquivo:"gamba de orelha branca.png" },
-  { nome:"Graxaim", cientifico:"Cerdocyon thous", grupo:"canideos", arquivo:"cachorro do mato.png" },
-  { nome:"Irara", cientifico:"Eira barbara", grupo:"mustelideos", arquivo:"irara.png" },
-  { nome:"Jaguatirica", cientifico:"Leopardus pardalis", grupo:"felinos", arquivo:"jaguatirica.png" },
-  { nome:"Macaco-prego", cientifico:"Sapajus nigritus", grupo:"primatas", arquivo:"macaco prego.png" },
-  { nome:"Mão-pelada", cientifico:"Procyon cancrivorus", grupo:"mustelideos", arquivo:"mao pelada.png" },
-  { nome:"Morcego-pescador", cientifico:"Noctilio leporinus", grupo:"morcegos", arquivo:"Noctilio leporinus morçego pescador.png" },
-  { nome:"Morcego-bombachudo", cientifico:"Chrotopterus auritus", grupo:"morcegos", arquivo:"Chrotopterus auritus.png" },
-  { nome:"Onça-parda", cientifico:"Puma concolor", grupo:"felinos", arquivo:"puma.png" },
-  { nome:"Ouriço-preto", cientifico:"Chaetomys subspinosus", grupo:"roedores", arquivo:"ouriço caxeiro.png" },
-  { nome:"Quati", cientifico:"Nasua nasua", grupo:"mustelideos", arquivo:"nasua nasua quati.png" },
-  { nome:"Tamanduá-mirim", cientifico:"Tamandua tetradactyla", grupo:"xenartros", arquivo:"tamandua mirim.png" },
-  { nome:"Veado-catingueiro", cientifico:"Mazama sp.", grupo:"ungulados", arquivo:"mazama veado mateiro.png" },
-  { nome:"Gato-do-mato-do-sul", cientifico:"Leopardus guttulus", grupo:"felinos", arquivo:"gato do mato do sul sem fundo.png" },
+  { nome:"Caxinguelê", cientifico:"Sciurus aestuans", grupo:"roedores" },
+  { nome:"Cachorro-vinagre", cientifico:"Speothos venaticus", grupo:"canideos" },
+  { nome:"Gambá-orelha-branca", cientifico:"Didelphis albiventris", grupo:"marsupiais" },
+  { nome:"Graxaim", cientifico:"Cerdocyon thous", grupo:"canideos" },
+  { nome:"Irara", cientifico:"Eira barbara", grupo:"mustelideos" },
+  { nome:"Jaguatirica", cientifico:"Leopardus pardalis", grupo:"felinos" },
+  { nome:"Macaco-prego", cientifico:"Sapajus nigritus", grupo:"primatas" },
+  { nome:"Mão-pelada", cientifico:"Procyon cancrivorus", grupo:"mustelideos" },
+  { nome:"Morcego-pescador", cientifico:"Noctilio leporinus", grupo:"morcegos" },
+  { nome:"Morcego-bombachudo", cientifico:"Chrotopterus auritus", grupo:"morcegos" },
+  { nome:"Onça-parda", cientifico:"Puma concolor", grupo:"felinos" },
+  { nome:"Ouriço-preto", cientifico:"Chaetomys subspinosus", grupo:"roedores" },
+  { nome:"Quati", cientifico:"Nasua nasua", grupo:"mustelideos" },
+  { nome:"Tamanduá-mirim", cientifico:"Tamandua tetradactyla", grupo:"xenartros" },
+  { nome:"Veado-catingueiro", cientifico:"Mazama sp.", grupo:"ungulados" },
+  { nome:"Gato-do-mato-do-sul", cientifico:"Leopardus guttulus", grupo:"felinos" },
   { nome:"Lobo-guará", cientifico:"Chrysocyon brachyurus", grupo:"canideos" },
   { nome:"Gato-maracajá", cientifico:"Leopardus wiedii", grupo:"felinos" },
   { nome:"Lontra", cientifico:"Lontra longicaudis", grupo:"mustelideos" },
@@ -1246,6 +1260,48 @@ function fileURL(filename){
   return GITHUB_RAW_BASE + filename.split('/').map(encodeURIComponent).join('/');
 }
 
+/* Normaliza um nome (de espécie ou de arquivo) para comparação:
+   remove acentos, baixa a caixa, troca hífen/underscore por
+   espaço e colapsa espaços — assim "Anta-brasileira",
+   "anta_brasileira" e "Anta   Brasileira" viram a mesma chave. */
+function normalizeName(str){
+  return str
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[-_]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+function stripExt(filename){
+  return filename.replace(/\.[a-z0-9]+$/i, '');
+}
+
+/* Lista a pasta /Ilustracoes no GitHub e devolve um mapa
+   nome-normalizado -> URL da imagem. Se a listagem falhar (ex:
+   limite de requisições da API pública do GitHub), devolve null
+   e os cards seguem mostrando o selo de "ilustração em produção". */
+async function fetchIllustrationIndex(){
+  try{
+    const res = await fetch(GITHUB_CONTENTS_API);
+    if(!res.ok) throw new Error('GitHub API respondeu ' + res.status);
+    const items = await res.json();
+    if(!Array.isArray(items)) throw new Error('resposta inesperada da API');
+
+    const index = new Map();
+    items.forEach(item => {
+      if(item.type !== 'file') return;
+      if(!/\.(png|jpe?g|webp|gif|svg)$/i.test(item.name)) return;
+      const key = normalizeName(stripExt(item.name));
+      const url = item.download_url || fileURL(item.name);
+      index.set(key, url);
+    });
+    return index;
+  }catch(err){
+    console.warn('Não foi possível listar as ilustrações do GitHub automaticamente:', err);
+    return null;
+  }
+}
+
 function placeholderSVG(nome){
   const initial = nome.trim().charAt(0).toUpperCase();
   const svg = `
@@ -1268,13 +1324,10 @@ function placeholderSVG(nome){
 const main = document.getElementById('especies');
 document.getElementById('count-all').textContent = SPECIES.length;
 
-const illustratedCount = SPECIES.filter(s => s.arquivo).length;
-document.getElementById('progressCount').textContent = `${illustratedCount}/${SPECIES.length}`;
-requestAnimationFrame(() => {
-  setTimeout(() => {
-    document.getElementById('progressFill').style.width = (illustratedCount / SPECIES.length * 100) + '%';
-  }, 200);
-});
+// O número real de ilustrações publicadas só é conhecido depois que
+// matchIllustrations() consulta o GitHub — aqui só deixamos o rótulo
+// pronto, mostrando o total de espécies do catálogo.
+document.getElementById('progressCount').textContent = `0/${SPECIES.length}`;
 
 const cardRegistry = []; // { species, groupKey, el }
 
@@ -1299,7 +1352,14 @@ Object.keys(GROUPS).forEach(key => {
   const grid = section.querySelector('.grid');
   members.forEach(s => {
     const fallback = placeholderSVG(s.nome);
-    const url = s.arquivo ? fileURL(s.arquivo) : fallback;
+
+    // "entry" é um objeto mutável: começa apontando pro placeholder
+    // e, se a busca no GitHub encontrar um arquivo com nome idêntico
+    // ao científico ou ao popular, entry.url é atualizado — o clique
+    // no card sempre lê entry.url no momento do clique, então a
+    // ficha abre com a imagem certa mesmo que a troca tenha
+    // acontecido depois da montagem inicial da página.
+    const entry = { species: s, groupKey: key, url: fallback, matched: false };
 
     const card = document.createElement('article');
     card.className = 'card reveal';
@@ -1308,45 +1368,76 @@ Object.keys(GROUPS).forEach(key => {
     card.setAttribute('aria-label', `Ver ficha completa de ${s.nome}`);
     card.dataset.nome = s.nome.toLowerCase();
     card.dataset.cientifico = s.cientifico.toLowerCase();
+    card.classList.add('is-placeholder');
     card.innerHTML = `
       <div class="card-media">
         <span class="card-tag">${GROUPS[key].title}</span>
-        <img src="${url}" alt="Ilustração de ${s.nome} (${s.cientifico})" loading="lazy"
-             onerror="this.onerror=null; this.src='${fallback}'; this.closest('.card').classList.add('is-placeholder');">
+        <img src="${fallback}" alt="Ilustração de ${s.nome} (${s.cientifico})" loading="lazy">
       </div>
       <div class="card-body">
         <h3>${s.nome}</h3>
         <span class="sci">${s.cientifico}</span>
         <p>${LOREM}</p>
-        <span class="placeholder-note ph-flag" hidden>Ilustração em produção</span>
+        <span class="placeholder-note ph-flag">Ilustração em produção</span>
       </div>
     `;
     const img = card.querySelector('img');
     const flag = card.querySelector('.ph-flag');
-    if(!s.arquivo){
-      flag.hidden = false;
-      card.classList.add('is-placeholder');
-    } else {
-      img.addEventListener('error', () => {
-        flag.hidden = false;
-        card.classList.add('is-placeholder');
-      }, { once:true });
-    }
 
-    card.addEventListener('click', () => openModal(s, url, GROUPS[key].title));
+    card.addEventListener('click', () => openModal(entry.species, entry.url, GROUPS[entry.groupKey].title));
     card.addEventListener('keydown', (e) => {
       if(e.key === 'Enter' || e.key === ' '){
         e.preventDefault();
-        openModal(s, url, GROUPS[key].title);
+        openModal(entry.species, entry.url, GROUPS[entry.groupKey].title);
       }
     });
 
     grid.appendChild(card);
-    cardRegistry.push({ species: s, groupKey: key, el: card, url });
+    entry.el = card;
+    entry.imgEl = img;
+    entry.flagEl = flag;
+    cardRegistry.push(entry);
   });
 
   main.appendChild(section);
 });
+
+/* ---------- CASAMENTO AUTOMÁTICO COM AS ILUSTRAÇÕES DO GITHUB ----------
+   Busca a listagem da pasta /Ilustracoes e, para cada espécie,
+   procura um arquivo cujo nome (normalizado) seja idêntico ao
+   nome científico OU ao nome popular — nessa ordem de prioridade. */
+async function matchIllustrations(){
+  const index = await fetchIllustrationIndex();
+  if(!index) return; // API indisponível: mantém os placeholders
+
+  cardRegistry.forEach(entry => {
+    const sciKey  = normalizeName(entry.species.cientifico);
+    const nomeKey = normalizeName(entry.species.nome);
+    const matchUrl = index.get(sciKey) || index.get(nomeKey);
+    if(!matchUrl) return;
+
+    entry.url = matchUrl;
+    entry.matched = true;
+    entry.imgEl.onerror = () => {
+      // arquivo listado mas que falhou ao carregar (raro): volta pro placeholder
+      entry.imgEl.onerror = null;
+      const fb = placeholderSVG(entry.species.nome);
+      entry.imgEl.src = fb;
+      entry.url = fb;
+      entry.matched = false;
+      entry.flagEl.hidden = false;
+      entry.el.classList.add('is-placeholder');
+    };
+    entry.imgEl.src = matchUrl;
+    entry.flagEl.hidden = true;
+    entry.el.classList.remove('is-placeholder');
+  });
+
+  const matchedCount = cardRegistry.filter(e => e.matched).length;
+  document.getElementById('progressCount').textContent = `${matchedCount}/${cardRegistry.length}`;
+  document.getElementById('progressFill').style.width = (matchedCount / cardRegistry.length * 100) + '%';
+}
+matchIllustrations();
 
 // Começa a buscar, em segundo plano, a foto real e o mapa de
 // ocorrência de todas as espécies — assim a ficha de cada uma já
