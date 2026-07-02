@@ -1276,30 +1276,74 @@ function stripExt(filename){
   return filename.replace(/\.[a-z0-9]+$/i, '');
 }
 
-/* Lista a pasta /Ilustracoes no GitHub e devolve um mapa
-   nome-normalizado -> URL da imagem. Se a listagem falhar (ex:
-   limite de requisições da API pública do GitHub), devolve null
-   e os cards seguem mostrando o selo de "ilustração em produção". */
+/* Lista a pasta /Ilustracoes e devolve um mapa
+   nome-normalizado -> URL da imagem.
+
+   Usa o jsDelivr (espelho público do GitHub, sem limite de
+   requisições) como fonte principal, com a API oficial do
+   GitHub como reserva — ela funciona igual, mas tem um limite
+   de 60 requisições/hora por IP, fácil de estourar quando a
+   página é recarregada várias vezes seguidas durante testes.
+   O resultado fica em cache por alguns minutos no navegador
+   (sessionStorage) para evitar bater esse limite à toa. */
+const ILLUSTRATION_INDEX_CACHE_KEY = 'mdf-illustration-index-v1';
+const ILLUSTRATION_INDEX_CACHE_MS = 10 * 60 * 1000; // 10 minutos
+const IMG_EXT_RE = /\.(png|jpe?g|webp|gif|svg)$/i;
+
+async function fetchIllustrationIndexFromJsDelivr(){
+  const url = `https://data.jsdelivr.com/v1/package/gh/${GITHUB_OWNER}/${GITHUB_REPO}@${GITHUB_BRANCH}/flat`;
+  const res = await fetch(url);
+  if(!res.ok) throw new Error('jsDelivr respondeu ' + res.status);
+  const data = await res.json();
+  const prefix = `/${ILLUSTRATIONS_DIR}/`;
+  const map = {};
+  (data.files || []).forEach(f => {
+    if(!f.name || !f.name.startsWith(prefix) || !IMG_EXT_RE.test(f.name)) return;
+    const filename = f.name.slice(prefix.length);
+    map[normalizeName(stripExt(filename))] = fileURL(filename);
+  });
+  return map;
+}
+
+async function fetchIllustrationIndexFromGitHubAPI(){
+  const res = await fetch(GITHUB_CONTENTS_API);
+  if(!res.ok) throw new Error('API do GitHub respondeu ' + res.status);
+  const items = await res.json();
+  if(!Array.isArray(items)) throw new Error('resposta inesperada da API do GitHub');
+  const map = {};
+  items.forEach(item => {
+    if(item.type !== 'file' || !IMG_EXT_RE.test(item.name)) return;
+    map[normalizeName(stripExt(item.name))] = item.download_url || fileURL(item.name);
+  });
+  return map;
+}
+
 async function fetchIllustrationIndex(){
   try{
-    const res = await fetch(GITHUB_CONTENTS_API);
-    if(!res.ok) throw new Error('GitHub API respondeu ' + res.status);
-    const items = await res.json();
-    if(!Array.isArray(items)) throw new Error('resposta inesperada da API');
+    const cached = JSON.parse(sessionStorage.getItem(ILLUSTRATION_INDEX_CACHE_KEY) || 'null');
+    if(cached && (Date.now() - cached.time) < ILLUSTRATION_INDEX_CACHE_MS){
+      return new Map(Object.entries(cached.map));
+    }
+  }catch(e){ /* sessionStorage indisponível: segue sem cache */ }
 
-    const index = new Map();
-    items.forEach(item => {
-      if(item.type !== 'file') return;
-      if(!/\.(png|jpe?g|webp|gif|svg)$/i.test(item.name)) return;
-      const key = normalizeName(stripExt(item.name));
-      const url = item.download_url || fileURL(item.name);
-      index.set(key, url);
-    });
-    return index;
+  let map = null;
+  try{
+    map = await fetchIllustrationIndexFromJsDelivr();
   }catch(err){
-    console.warn('Não foi possível listar as ilustrações do GitHub automaticamente:', err);
-    return null;
+    console.warn('Listagem via jsDelivr falhou (' + err.message + '), tentando a API do GitHub…');
+    try{
+      map = await fetchIllustrationIndexFromGitHubAPI();
+    }catch(err2){
+      console.warn('Listagem via API do GitHub também falhou:', err2);
+      return null;
+    }
   }
+
+  try{
+    sessionStorage.setItem(ILLUSTRATION_INDEX_CACHE_KEY, JSON.stringify({ time: Date.now(), map }));
+  }catch(e){ /* sessionStorage indisponível: só não cacheia */ }
+
+  return new Map(Object.entries(map));
 }
 
 function placeholderSVG(nome){
@@ -1773,4 +1817,3 @@ toTopBtn.addEventListener('click', () => window.scrollTo({ top:0, behavior:'smoo
 </script>
 </body>
 </html>
-
