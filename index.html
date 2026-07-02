@@ -1,0 +1,1205 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mamíferos da Serra Dona Francisca — Cartilha</title>
+<meta name="description" content="Cartilha ilustrada dos mamíferos da Área de Proteção Ambiental Serra Dona Francisca, Joinville (SC).">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,500;1,9..144,600&family=Inter:wght@400;500;600&family=Space+Mono:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --forest-deep:#1e3820;
+    --forest:#3d6b2c;
+    --forest-light:#7ea854;
+    --cream:#f6f1e4;
+    --paper:#fbf8f1;
+    --bark:#6b4a30;
+    --gold:#c79a2e;
+    --ink:#1f261b;
+    --ink-soft:#4c5442;
+    --line: rgba(30,56,32,.14);
+    --radius: 22px;
+    --shadow: 0 18px 40px -20px rgba(20,35,15,.45);
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  img{max-width:100%;display:block;}
+  a{color:inherit;}
+
+  h1,h2,h3,.display{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    letter-spacing:-.01em;
+    margin:0;
+  }
+  .eyebrow{
+    font-family:'Fraunces',serif;
+    font-style:italic;
+    font-weight:400;
+    color:var(--gold);
+    letter-spacing:.02em;
+  }
+  .mono{
+    font-family:'Space Mono',monospace;
+    text-transform:uppercase;
+    letter-spacing:.12em;
+  }
+
+  /* ---------- HERO ---------- */
+  .hero{
+    position:relative;
+    background:var(--forest-deep);
+    color:var(--cream);
+    overflow:hidden;
+    padding-bottom:120px;
+  }
+  .hero::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:
+      radial-gradient(1200px 500px at 15% -10%, rgba(126,168,84,.35), transparent 60%),
+      radial-gradient(900px 500px at 100% 0%, rgba(199,154,46,.18), transparent 55%);
+    pointer-events:none;
+  }
+  .canopy{
+    position:absolute;
+    top:-6%;
+    left:0;
+    width:100%;
+    height:78%;
+    background:var(--forest);
+    clip-path: polygon(0% 0%, 100% 0%, 100% 38%, 92% 45%, 84% 40%, 74% 52%, 63% 44%, 52% 58%, 41% 48%, 30% 60%, 20% 50%, 9% 62%, 0% 52%);
+    opacity:.9;
+  }
+  .canopy.two{
+    top:-10%;
+    height:56%;
+    background:var(--forest-deep);
+    opacity:.55;
+    clip-path: polygon(0% 0%, 100% 0%, 100% 20%, 88% 30%, 78% 22%, 66% 34%, 55% 24%, 44% 36%, 33% 26%, 22% 38%, 10% 28%, 0% 34%);
+  }
+  .hero-inner{
+    position:relative;
+    z-index:2;
+    max-width:1180px;
+    margin:0 auto;
+    padding:64px 32px 0;
+    text-align:center;
+  }
+  .brand-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    font-family:'Space Mono',monospace;
+    font-size:.72rem;
+    text-transform:uppercase;
+    letter-spacing:.14em;
+    color:rgba(246,241,228,.65);
+    margin-bottom:120px;
+  }
+  .brand-row .tag{
+    border:1px solid rgba(246,241,228,.3);
+    border-radius:999px;
+    padding:6px 14px;
+  }
+  .hero-eyebrow{
+    font-size:1.5rem;
+    display:block;
+    margin-bottom:18px;
+  }
+  .hero h1{
+    font-size:clamp(2.6rem, 6vw, 5.2rem);
+    line-height:1.02;
+    color:var(--paper);
+  }
+  .hero h1 em{
+    font-style:italic;
+    color:var(--gold);
+  }
+  .hero-sub{
+    max-width:560px;
+    margin:26px auto 0;
+    font-size:1.05rem;
+    line-height:1.6;
+    color:rgba(246,241,228,.82);
+  }
+  .authors{
+    margin-top:34px;
+    font-family:'Fraunces',serif;
+    font-style:italic;
+    font-size:1.05rem;
+    color:rgba(246,241,228,.75);
+  }
+  .authors span{display:block; margin:2px 0;}
+
+  .hero-strip{
+    position:relative;
+    z-index:2;
+    margin-top:56px;
+    border-radius:28px 28px 0 0;
+    overflow:hidden;
+    box-shadow:var(--shadow);
+    max-width:1180px;
+    margin-left:auto;
+    margin-right:auto;
+  }
+  .hero-strip img{
+    width:100%;
+    height:clamp(140px, 22vw, 260px);
+    object-fit:cover;
+    object-position:center 30%;
+    filter:saturate(1.05);
+  }
+  .hero-strip::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:linear-gradient(0deg, rgba(30,56,32,.55), transparent 45%);
+  }
+
+  /* ---------- INTRO ---------- */
+  .intro{
+    position:relative;
+    background:var(--cream);
+    padding:90px 32px 80px;
+  }
+  .intro::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    background-image:url('assets/leaves.jpg');
+    background-size:cover;
+    background-position:center;
+    opacity:.06;
+    pointer-events:none;
+  }
+  .intro-inner{
+    position:relative;
+    max-width:1100px;
+    margin:0 auto;
+    display:grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap:64px;
+    align-items:start;
+  }
+  .intro h2{
+    font-size:2.1rem;
+    color:var(--forest-deep);
+    margin-bottom:22px;
+    max-width:420px;
+  }
+  .intro p{
+    line-height:1.75;
+    color:var(--ink-soft);
+    margin:0 0 16px;
+  }
+  .fact-card{
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:30px;
+    box-shadow:var(--shadow);
+  }
+  .fact-card .mono{
+    color:var(--forest);
+    font-size:.68rem;
+    display:block;
+    margin-bottom:14px;
+  }
+  .fact-list{
+    list-style:none;
+    margin:0;
+    padding:0;
+    display:grid;
+    gap:16px;
+  }
+  .fact-list li{
+    display:grid;
+    grid-template-columns:auto 1fr;
+    gap:14px;
+    align-items:baseline;
+    padding-bottom:14px;
+    border-bottom:1px solid var(--line);
+  }
+  .fact-list li:last-child{border-bottom:none; padding-bottom:0;}
+  .fact-list .num{
+    font-family:'Fraunces',serif;
+    font-style:italic;
+    color:var(--gold);
+    font-size:1.1rem;
+  }
+  .fact-list .lbl{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    display:block;
+    color:var(--forest-deep);
+  }
+  .fact-list .desc{
+    color:var(--ink-soft);
+    font-size:.92rem;
+    line-height:1.5;
+  }
+
+  /* ---------- FILTER NAV ---------- */
+  .filter-bar{
+    position:sticky;
+    top:0;
+    z-index:20;
+    background:rgba(246,241,228,.92);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+    padding:16px 32px;
+  }
+  .filter-inner{
+    max-width:1180px;
+    margin:0 auto;
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    align-items:center;
+  }
+  .filter-inner .lbl{
+    font-family:'Space Mono',monospace;
+    font-size:.68rem;
+    text-transform:uppercase;
+    letter-spacing:.12em;
+    color:var(--ink-soft);
+    margin-right:6px;
+  }
+  .chip{
+    font-family:'Inter',sans-serif;
+    font-size:.83rem;
+    font-weight:500;
+    background:transparent;
+    border:1px solid var(--line);
+    color:var(--ink-soft);
+    padding:8px 16px;
+    border-radius:999px;
+    cursor:pointer;
+    transition:.18s ease;
+    white-space:nowrap;
+  }
+  .chip:hover{border-color:var(--forest-light); color:var(--forest-deep);}
+  .chip.active{
+    background:var(--forest-deep);
+    border-color:var(--forest-deep);
+    color:var(--paper);
+  }
+
+  /* ---------- SPECIES SECTIONS ---------- */
+  .species-wrap{
+    max-width:1180px;
+    margin:0 auto;
+    padding:70px 32px 40px;
+  }
+  .group{
+    margin-bottom:64px;
+  }
+  .group-head{
+    display:flex;
+    align-items:baseline;
+    gap:16px;
+    margin-bottom:28px;
+  }
+  .group-head h2{
+    font-size:1.7rem;
+    color:var(--forest-deep);
+  }
+  .group-head .count{
+    font-family:'Space Mono',monospace;
+    font-size:.72rem;
+    color:var(--forest);
+    background:rgba(61,107,44,.1);
+    padding:4px 10px;
+    border-radius:999px;
+  }
+  .group-line{
+    flex:1;
+    height:1px;
+    background:var(--line);
+  }
+  .group-note{
+    font-size:.88rem;
+    color:var(--ink-soft);
+    margin:-14px 0 26px;
+    max-width:640px;
+    line-height:1.6;
+  }
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(260px, 1fr));
+    gap:26px;
+  }
+
+  .card{
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    overflow:hidden;
+    box-shadow:0 14px 30px -22px rgba(20,35,15,.5);
+    transition:transform .22s ease, box-shadow .22s ease;
+    display:flex;
+    flex-direction:column;
+  }
+  .card:hover{
+    transform:translateY(-5px);
+    box-shadow:var(--shadow);
+  }
+  .card-media{
+    position:relative;
+    aspect-ratio:4/3.2;
+    background:
+      radial-gradient(120% 140% at 20% 0%, rgba(126,168,84,.35), transparent 60%),
+      var(--forest-deep);
+    overflow:hidden;
+  }
+  .card-media img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    object-position:center 20%;
+  }
+  .card-tag{
+    position:absolute;
+    top:12px;
+    left:12px;
+    background:rgba(31,38,27,.55);
+    color:var(--cream);
+    font-family:'Space Mono',monospace;
+    font-size:.62rem;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    padding:5px 9px;
+    border-radius:6px;
+    backdrop-filter:blur(3px);
+  }
+  .card-body{
+    padding:20px 22px 22px;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    flex:1;
+  }
+  .card-body h3{
+    font-size:1.18rem;
+    color:var(--forest-deep);
+  }
+  .sci{
+    font-family:'Fraunces',serif;
+    font-style:italic;
+    color:var(--bark);
+    font-size:.9rem;
+  }
+  .card-body p{
+    margin:6px 0 0;
+    font-size:.86rem;
+    line-height:1.6;
+    color:var(--ink-soft);
+  }
+
+  .placeholder-note{
+    margin-top:auto;
+    padding-top:10px;
+    font-family:'Space Mono',monospace;
+    font-size:.6rem;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    color:var(--forest-light);
+  }
+
+  /* ---------- FOOTER ---------- */
+  footer{
+    background:var(--forest-deep);
+    color:var(--cream);
+    padding:80px 32px 40px;
+    position:relative;
+    overflow:hidden;
+  }
+  footer::before{
+    content:"";
+    position:absolute;
+    top:0;left:0;right:0;
+    height:100%;
+    background:radial-gradient(900px 400px at 90% 0%, rgba(199,154,46,.14), transparent 60%);
+    pointer-events:none;
+  }
+  .footer-inner{
+    position:relative;
+    max-width:1100px;
+    margin:0 auto;
+  }
+  .footer-top{
+    display:grid;
+    grid-template-columns:1.2fr 1fr;
+    gap:50px;
+    padding-bottom:44px;
+    border-bottom:1px solid rgba(246,241,228,.15);
+  }
+  footer h2{
+    font-size:1.8rem;
+    color:var(--paper);
+    margin-bottom:14px;
+  }
+  footer p{
+    color:rgba(246,241,228,.72);
+    line-height:1.7;
+    font-size:.92rem;
+    max-width:440px;
+  }
+  .credits dl{
+    display:grid;
+    grid-template-columns:auto 1fr;
+    gap:10px 18px;
+    margin:0;
+  }
+  .credits dt{
+    font-family:'Space Mono',monospace;
+    font-size:.66rem;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    color:var(--forest-light);
+    white-space:nowrap;
+    padding-top:2px;
+  }
+  .credits dd{
+    margin:0;
+    font-size:.92rem;
+    color:rgba(246,241,228,.9);
+    line-height:1.5;
+  }
+  .credits a{
+    text-decoration:underline;
+    text-decoration-color:rgba(199,154,46,.6);
+    text-underline-offset:3px;
+  }
+  .credits a:hover{color:var(--gold);}
+  .footer-bottom{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:12px;
+    padding-top:26px;
+    font-family:'Space Mono',monospace;
+    font-size:.68rem;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    color:rgba(246,241,228,.5);
+  }
+  .footer-bottom a{text-decoration:underline; text-underline-offset:3px;}
+
+  @media (max-width:760px){
+    .intro-inner{grid-template-columns:1fr;}
+    .footer-top{grid-template-columns:1fr;}
+    .brand-row{margin-bottom:70px; flex-wrap:wrap;}
+    .hero-inner{padding-top:40px;}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto;}
+    .card{transition:none;}
+  }
+
+  /* ---------- MODAL ---------- */
+  .card{cursor:pointer;}
+  .card:focus-visible{outline:2px solid var(--forest-light); outline-offset:3px;}
+
+  .modal-overlay{
+    position:fixed;
+    inset:0;
+    z-index:100;
+    display:none;
+    align-items:flex-start;
+    justify-content:center;
+    padding:4vh 20px;
+    overflow-y:auto;
+    background:rgba(15,24,13,.72);
+    backdrop-filter:blur(4px);
+  }
+  .modal-overlay.open{display:flex;}
+  .modal-card{
+    position:relative;
+    width:min(1080px, 100%);
+    background:var(--paper);
+    border-radius:26px;
+    box-shadow:0 40px 80px -30px rgba(0,0,0,.6);
+    overflow:hidden;
+    animation:modalIn .25s ease;
+  }
+  @keyframes modalIn{
+    from{opacity:0; transform:translateY(14px) scale(.985);}
+    to{opacity:1; transform:none;}
+  }
+  .modal-close{
+    position:absolute;
+    top:16px; right:16px;
+    z-index:5;
+    width:38px; height:38px;
+    border-radius:50%;
+    border:none;
+    background:rgba(31,38,27,.55);
+    color:var(--cream);
+    font-size:1.4rem;
+    line-height:1;
+    cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    backdrop-filter:blur(3px);
+  }
+  .modal-close:hover{background:var(--forest-deep);}
+
+  .modal-grid{
+    display:grid;
+    grid-template-columns: 260px 1fr;
+  }
+  .modal-map{
+    background:var(--forest-deep);
+    padding:26px 22px;
+    display:flex;
+    flex-direction:column;
+    color:var(--cream);
+  }
+  .map-head{margin-bottom:14px;}
+  .map-head .mono{font-size:.65rem; color:var(--forest-light);}
+  .map-wrap{
+    position:relative;
+    background:rgba(0,0,0,.15);
+    border-radius:14px;
+    overflow:hidden;
+    min-height:260px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .map-wrap svg{display:block;}
+  .map-loading{
+    font-family:'Space Mono',monospace;
+    font-size:.68rem;
+    color:rgba(246,241,228,.6);
+    text-align:center;
+    padding:20px;
+  }
+  .map-empty-note{
+    position:absolute;
+    bottom:8px; left:8px; right:8px;
+    font-size:.62rem;
+    line-height:1.4;
+    color:rgba(246,241,228,.75);
+    background:rgba(0,0,0,.35);
+    padding:6px 8px;
+    border-radius:8px;
+    margin:0;
+  }
+  .map-caption{
+    font-size:.72rem;
+    line-height:1.55;
+    color:rgba(246,241,228,.62);
+    margin:14px 0 0;
+  }
+
+  .modal-main{
+    padding:26px 30px 32px;
+    display:flex;
+    flex-direction:column;
+    gap:20px;
+    min-width:0;
+  }
+  .modal-illustration{
+    position:relative;
+    background:var(--forest-deep);
+    border-radius:18px;
+    overflow:hidden;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    min-height:280px;
+  }
+  .modal-illustration img#modalIllustration{
+    width:100%;
+    max-height:56vh;
+    object-fit:contain;
+    padding:14px;
+  }
+  .modal-photo-badge{
+    position:absolute;
+    top:14px; right:14px;
+    width:104px;
+    background:rgba(251,248,241,.95);
+    border-radius:12px;
+    padding:6px;
+    box-shadow:0 10px 24px -10px rgba(0,0,0,.5);
+    text-align:center;
+  }
+  .modal-photo-badge img#modalRealPhoto{
+    width:100%;
+    aspect-ratio:1/1;
+    object-fit:cover;
+    border-radius:8px;
+    background:var(--line);
+  }
+  .modal-photo-badge.loading img#modalRealPhoto{opacity:.3;}
+  .modal-photo-badge.empty img#modalRealPhoto{display:none;}
+  .modal-photo-credit{
+    display:block;
+    font-family:'Space Mono',monospace;
+    font-size:.5rem;
+    line-height:1.35;
+    color:var(--ink-soft);
+    margin-top:5px;
+    word-break:break-word;
+  }
+  .modal-photo-badge::before{
+    content:"Foto real";
+    display:block;
+    font-family:'Space Mono',monospace;
+    font-size:.48rem;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    color:var(--forest);
+    margin-bottom:3px;
+  }
+
+  .modal-info h2{
+    font-size:1.9rem;
+    color:var(--forest-deep);
+    margin-bottom:2px;
+  }
+  .modal-info .sci{font-size:1.05rem;}
+  .modal-info p{
+    margin-top:12px;
+    color:var(--ink-soft);
+    line-height:1.7;
+    font-size:.95rem;
+  }
+  .modal-info .card-tag{
+    position:static;
+    display:inline-block;
+    background:rgba(61,107,44,.12);
+    color:var(--forest-deep);
+    margin-bottom:10px;
+  }
+
+  @media (max-width:720px){
+    .modal-grid{grid-template-columns:1fr;}
+    .modal-map{order:2;}
+    .modal-main{order:1;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ HERO ============ -->
+<header class="hero">
+  <div class="canopy two"></div>
+  <div class="canopy"></div>
+  <div class="hero-inner">
+    <div class="brand-row">
+      <span class="tag">APA Dona Francisca · Joinville, SC</span>
+      <span class="tag">Educação ambiental &amp; ilustração científica</span>
+    </div>
+    <span class="eyebrow hero-eyebrow">Cartilha</span>
+    <h1>Mamíferos da<br><em>Serra Dona Francisca</em></h1>
+    <p class="hero-sub">Um guia de campo ilustrado para conhecer — e ajudar a proteger — os mamíferos que habitam a Área de Proteção Ambiental Dona Francisca.</p>
+    <p class="authors">
+      <span>Brenno Alef Benk</span>
+      <span>Denise Mouga</span>
+      <span>Helen Sabrine Hoffmann</span>
+    </p>
+  </div>
+  <div class="hero-strip">
+    <img src="assets/banner.jpeg" alt="Ilustrações de mamíferos da Serra Dona Francisca lado a lado: anta, veado, puma, quati, tamanduá, macaco-prego e outros.">
+  </div>
+</header>
+
+<!-- ============ INTRO ============ -->
+<section class="intro" id="sobre">
+  <div class="intro-inner">
+    <div>
+      <span class="eyebrow" style="font-size:1rem;">Sobre a Serra</span>
+      <h2>Uma floresta que sustenta água, solo e clima — e uma comunidade inteira de mamíferos.</h2>
+      <p>A Serra Dona Francisca é um lugar muito especial em Joinville (SC). Nela está a Área de Proteção Ambiental (APA) Dona Francisca, criada para garantir que a natureza seja conservada e, ao mesmo tempo, utilizada de forma responsável pelas pessoas. Esse espaço abriga florestas, rios e muitas espécies de animais, sendo essencial para manter o clima equilibrado, proteger os mananciais de água e conservar o solo.</p>
+      <p>Entre os habitantes mais importantes dessa região estão os mamíferos: animais que espalham sementes, controlam populações de outras espécies e mantêm o equilíbrio da mata. Esta cartilha nasceu para aproximar essa ciência da comunidade — em linguagem simples, lúdica e ilustrada — e despertar o interesse das crianças pela fauna do seu próprio território.</p>
+    </div>
+    <div class="fact-card">
+      <span class="mono">Sobre este catálogo</span>
+      <ul class="fact-list">
+        <li>
+          <span class="num">I.</span>
+          <div>
+            <span class="lbl">Ilustração científica</span>
+            <span class="desc">Cada espécie é retratada com base em pesquisa iconográfica e rigor científico, adaptando técnicas de paleoarte à fauna atual.</span>
+          </div>
+        </li>
+        <li>
+          <span class="num">II.</span>
+          <div>
+            <span class="lbl">Origem dos dados</span>
+            <span class="desc">Baseado no levantamento de campo realizado na APA Dona Francisca, complementado por espécies de áreas vizinhas do mesmo contexto ecológico.</span>
+          </div>
+        </li>
+        <li>
+          <span class="num">III.</span>
+          <div>
+            <span class="lbl">Em construção</span>
+            <span class="desc">Ilustrações e textos estão sendo publicados aos poucos. Fichas ainda sem conteúdo definitivo trazem texto provisório.</span>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FILTER ============ -->
+<nav class="filter-bar" id="filtros">
+  <div class="filter-inner">
+    <span class="lbl">Filtrar por grupo</span>
+    <button class="chip active" data-filter="all">Todos (<span id="count-all"></span>)</button>
+    <button class="chip" data-filter="felinos">Felinos</button>
+    <button class="chip" data-filter="canideos">Canídeos</button>
+    <button class="chip" data-filter="primatas">Primatas</button>
+    <button class="chip" data-filter="marsupiais">Marsupiais</button>
+    <button class="chip" data-filter="mustelideos">Mustelídeos &amp; procionídeos</button>
+    <button class="chip" data-filter="roedores">Roedores</button>
+    <button class="chip" data-filter="ungulados">Ungulados</button>
+    <button class="chip" data-filter="xenartros">Tatus &amp; tamanduás</button>
+    <button class="chip" data-filter="morcegos">Morcegos</button>
+    <button class="chip" data-filter="outros">Outros</button>
+  </div>
+</nav>
+
+<!-- ============ SPECIES ============ -->
+<main class="species-wrap" id="especies"></main>
+
+<!-- ============ MODAL: FICHA DA ESPÉCIE ============ -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalName">
+    <button class="modal-close" id="modalClose" aria-label="Fechar ficha">&times;</button>
+    <div class="modal-grid">
+      <div class="modal-map">
+        <div class="map-head">
+          <span class="mono">Ocorrência no Brasil</span>
+        </div>
+        <div class="map-wrap" id="modalMap">
+          <span class="map-loading">Carregando mapa…</span>
+        </div>
+        <p class="map-caption">Pontos com base em registros públicos da espécie no <a href="https://www.gbif.org" target="_blank" rel="noopener" style="color:inherit;">GBIF.org</a>. Mostra onde a espécie já foi observada, não uma área contínua de distribuição.</p>
+      </div>
+      <div class="modal-main">
+        <div class="modal-illustration">
+          <img id="modalIllustration" src="" alt="">
+          <div class="modal-photo-badge loading" id="modalPhotoBadge">
+            <img id="modalRealPhoto" src="" alt="Foto real da espécie via iNaturalist">
+            <span class="modal-photo-credit" id="modalPhotoCredit">Buscando foto…</span>
+          </div>
+        </div>
+        <div class="modal-info">
+          <span class="card-tag" id="modalGroupTag"></span>
+          <h2 id="modalName"></h2>
+          <span class="sci" id="modalSci"></span>
+          <p id="modalDesc"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ FOOTER ============ -->
+<footer id="equipe">
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div>
+        <h2>Uma cartilha feita por muitas mãos.</h2>
+        <p>Este projeto une pesquisa de campo, ilustração científica e educação ambiental para aproximar a comunidade de Joinville da biodiversidade que existe no seu próprio quintal — a Serra Dona Francisca.</p>
+        <p>Todas as ilustrações são originais, produzidas digitalmente e hospedadas no <a href="https://github.com/brennobenk1/MamiferosDaSerraDonaFrancisca" target="_blank" rel="noopener">repositório do projeto no GitHub</a>.</p>
+      </div>
+      <div class="credits">
+        <dl>
+          <dt>Coordenação</dt>
+          <dd>Dra. <a href="https://www.escavador.com/sobre/3081577/denise-monique-dubet-da-silva-mouga" target="_blank" rel="noopener">Denise Monique Dubet da Silva Mouga</a></dd>
+
+          <dt>Pesquisa de campo</dt>
+          <dd>Helen Sabrine Hoffmann</dd>
+
+          <dt>Ilustração &amp; site</dt>
+          <dd>Brenno Alef Benk</dd>
+
+          <dt>Textos</dt>
+          <dd>Dra. <a href="https://www.escavador.com/sobre/3081577/denise-monique-dubet-da-silva-mouga" target="_blank" rel="noopener">Denise Monique Dubet da Silva Mouga</a>, Lucas Henrique Ineichen Damiani, Salem Brian Seger e Vitor Augusto Iwaya Goulart</dd>
+        </dl>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>Cartilha Mamíferos da Serra Dona Francisca — APA Dona Francisca, Joinville/SC</span>
+      <a href="https://github.com/brennobenk1/MamiferosDaSerraDonaFrancisca" target="_blank" rel="noopener">github.com/brennobenk1/MamiferosDaSerraDonaFrancisca</a>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
+<script>
+/* ===========================================================
+   DADOS DAS ESPÉCIES
+   -----------------------------------------------------------
+   Para publicar uma ilustração, adicione no repositório do
+   GitHub um arquivo em:  /ilustracoes/<slug>.png
+   onde <slug> é o nome científico em minúsculas, com hífen
+   no lugar do espaço (ex: Tapirus terrestris -> tapirus-terrestris.png)
+   Enquanto o arquivo não existir, o card mostra um selo
+   "ilustração em produção" no lugar da imagem.
+   =========================================================== */
+
+const GITHUB_RAW_BASE = "https://raw.githubusercontent.com/brennobenk1/MamiferosDaSerraDonaFrancisca/main/Ilustracoes/";
+
+const LOREM = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua, habitando na mata da Serra Dona Francisca.";
+
+const GROUPS = {
+  felinos:      { title: "Felinos",                     note: "Os grandes e pequenos gatos selvagens da Serra, predadores essenciais para o equilíbrio da fauna." },
+  canideos:     { title: "Canídeos",                     note: "Parentes silvestres do cachorro doméstico, com hábitos e tamanhos bem diferentes entre si." },
+  primatas:     { title: "Primatas",                     note: "Espécies arborícolas que cumprem papel fundamental na dispersão de sementes da mata." },
+  marsupiais:   { title: "Marsupiais",                   note: "Mamíferos que carregam os filhotes em bolsa (marsúpio) e são ótimos indicadores de floresta saudável." },
+  mustelideos:  { title: "Mustelídeos &amp; procionídeos", note: "Carnívoros de médio porte, muitas vezes arborícolas ou semiaquáticos." },
+  roedores:     { title: "Roedores",                     note: "Do menor caxinguelê à capivara, o maior roedor do mundo — presentes em quase todos os ambientes da Serra." },
+  ungulados:    { title: "Ungulados",                    note: "Mamíferos de casco, herbívoros, fundamentais para a regeneração da floresta." },
+  xenartros:    { title: "Tatus &amp; tamanduás",        note: "Grupo exclusivo das Américas, com carapaças ou garras especializadas para escavar." },
+  morcegos:     { title: "Morcegos",                     note: "Os únicos mamíferos capazes de voo ativo, com papéis que vão da polinização ao controle de insetos." },
+  outros:       { title: "Outras espécies da Serra",     note: "Espécies associadas ao mesmo mosaico florestal, registradas junto ao levantamento de campo." },
+};
+
+const SPECIES = [
+  { nome:"Anta-brasileira", cientifico:"Tapirus terrestris", grupo:"ungulados", arquivo:"anta.png" },
+  { nome:"Cuíca-graciosa", cientifico:"Gracilinanus agilis", grupo:"marsupiais" },
+  { nome:"Caxinguelê", cientifico:"Sciurus aestuans", grupo:"roedores", arquivo:"Caxinguele.png" },
+  { nome:"Cachorro-vinagre", cientifico:"Speothos venaticus", grupo:"canideos", arquivo:"Cachorro vinagre.png" },
+  { nome:"Gambá-orelha-branca", cientifico:"Didelphis albiventris", grupo:"marsupiais", arquivo:"gamba de orelha branca.png" },
+  { nome:"Graxaim", cientifico:"Cerdocyon thous", grupo:"canideos", arquivo:"cachorro do mato.png" },
+  { nome:"Irara", cientifico:"Eira barbara", grupo:"mustelideos", arquivo:"irara.png" },
+  { nome:"Jaguatirica", cientifico:"Leopardus pardalis", grupo:"felinos", arquivo:"jaguatirica.png" },
+  { nome:"Macaco-prego", cientifico:"Sapajus nigritus", grupo:"primatas", arquivo:"macaco prego.png" },
+  { nome:"Mão-pelada", cientifico:"Procyon cancrivorus", grupo:"mustelideos", arquivo:"mao pelada.png" },
+  { nome:"Morcego-pescador", cientifico:"Noctilio leporinus", grupo:"morcegos", arquivo:"Noctilio leporinus morçego pescador.png" },
+  { nome:"Morcego-bombachudo", cientifico:"Chrotopterus auritus", grupo:"morcegos", arquivo:"Chrotopterus auritus.png" },
+  { nome:"Onça-parda", cientifico:"Puma concolor", grupo:"felinos", arquivo:"puma.png" },
+  { nome:"Ouriço-preto", cientifico:"Chaetomys subspinosus", grupo:"roedores", arquivo:"ouriço caxeiro.png" },
+  { nome:"Quati", cientifico:"Nasua nasua", grupo:"mustelideos", arquivo:"nasua nasua quati.png" },
+  { nome:"Tamanduá-mirim", cientifico:"Tamandua tetradactyla", grupo:"xenartros", arquivo:"tamandua mirim.png" },
+  { nome:"Veado-catingueiro", cientifico:"Mazama sp.", grupo:"ungulados", arquivo:"mazama veado mateiro.png" },
+  { nome:"Gato-do-mato-do-sul", cientifico:"Leopardus guttulus", grupo:"felinos", arquivo:"gato do mato do sul sem fundo.png" },
+  { nome:"Lobo-guará", cientifico:"Chrysocyon brachyurus", grupo:"canideos" },
+  { nome:"Gato-maracajá", cientifico:"Leopardus wiedii", grupo:"felinos" },
+  { nome:"Lontra", cientifico:"Lontra longicaudis", grupo:"mustelideos" },
+  { nome:"Ratão-do-banhado", cientifico:"Myocastor coypus", grupo:"roedores" },
+  { nome:"Gambá-orelha-preta", cientifico:"Didelphis aurita", grupo:"marsupiais" },
+  { nome:"Bugio-ruivo", cientifico:"Alouatta clamitans", grupo:"primatas" },
+  { nome:"Capivara", cientifico:"Hydrochoerus hydrochaeris", grupo:"roedores" },
+  { nome:"Cateto", cientifico:"Pecari tajacu", grupo:"ungulados" },
+  { nome:"Cutia", cientifico:"Dasyprocta azarae", grupo:"roedores" },
+  { nome:"Furão-pequeno", cientifico:"Galictis cuja", grupo:"mustelideos" },
+  { nome:"Gato-do-mato", cientifico:"Leopardus tigrinus", grupo:"felinos" },
+  { nome:"Gato-mourisco", cientifico:"Herpailurus yagouaroundi", grupo:"felinos" },
+  { nome:"Gavião-carijó", cientifico:"Rupornis magnirostris", grupo:"outros" },
+  { nome:"Graxaim-do-campo", cientifico:"Lycalopex gymnocercus", grupo:"canideos" },
+  { nome:"Onça-pintada", cientifico:"Panthera onca", grupo:"felinos" },
+  { nome:"Paca", cientifico:"Cuniculus paca", grupo:"roedores" },
+  { nome:"Preá", cientifico:"Cavia aperea", grupo:"roedores" },
+  { nome:"Tapiti", cientifico:"Sylvilagus brasiliensis", grupo:"outros" },
+  { nome:"Tatu-peba", cientifico:"Euphractus sexcinctus", grupo:"xenartros" },
+  { nome:"Zorrilho", cientifico:"Conepatus chinga", grupo:"mustelideos" },
+];
+
+/* Monta a URL "raw" do GitHub a partir do nome exato do arquivo,
+   codificando espaços e acentos corretamente. */
+function fileURL(filename){
+  return GITHUB_RAW_BASE + filename.split('/').map(encodeURIComponent).join('/');
+}
+
+function placeholderSVG(nome){
+  const initial = nome.trim().charAt(0).toUpperCase();
+  const svg = `
+  <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 320'>
+    <defs>
+      <radialGradient id='g' cx='30%' cy='20%' r='90%'>
+        <stop offset='0%' stop-color='#7ea854' stop-opacity='0.55'/>
+        <stop offset='100%' stop-color='#1e3820' stop-opacity='0'/>
+      </radialGradient>
+    </defs>
+    <rect width='400' height='320' fill='#1e3820'/>
+    <rect width='400' height='320' fill='url(#g)'/>
+    <path d='M0 260 C60 230 110 250 150 225 C190 200 210 235 260 210 C310 185 340 215 400 195 L400 320 L0 320 Z' fill='#284d29'/>
+    <circle cx='200' cy='140' r='46' fill='none' stroke='#c79a2e' stroke-width='1.4' stroke-dasharray='4 6' opacity='0.8'/>
+    <text x='200' y='156' font-family='Fraunces, serif' font-size='44' font-style='italic' fill='#f6f1e4' text-anchor='middle'>${initial}</text>
+  </svg>`;
+  return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg);
+}
+
+const main = document.getElementById('especies');
+document.getElementById('count-all').textContent = SPECIES.length;
+
+Object.keys(GROUPS).forEach(key => {
+  const members = SPECIES.filter(s => s.grupo === key);
+  if(!members.length) return;
+
+  const section = document.createElement('section');
+  section.className = 'group';
+  section.dataset.group = key;
+
+  section.innerHTML = `
+    <div class="group-head">
+      <h2>${GROUPS[key].title}</h2>
+      <span class="count">${members.length}</span>
+      <span class="group-line"></span>
+    </div>
+    <p class="group-note">${GROUPS[key].note}</p>
+    <div class="grid"></div>
+  `;
+
+  const grid = section.querySelector('.grid');
+  members.forEach(s => {
+    const fallback = placeholderSVG(s.nome);
+    const url = s.arquivo ? fileURL(s.arquivo) : fallback;
+
+    const card = document.createElement('article');
+    card.className = 'card';
+    card.tabIndex = 0;
+    card.setAttribute('role','button');
+    card.setAttribute('aria-label', `Ver ficha completa de ${s.nome}`);
+    card.innerHTML = `
+      <div class="card-media">
+        <span class="card-tag">${GROUPS[key].title}</span>
+        <img src="${url}" alt="Ilustração de ${s.nome} (${s.cientifico})"
+             onerror="this.onerror=null; this.src='${fallback}'; this.closest('.card').classList.add('is-placeholder');">
+      </div>
+      <div class="card-body">
+        <h3>${s.nome}</h3>
+        <span class="sci">${s.cientifico}</span>
+        <p>${LOREM}</p>
+        <span class="placeholder-note ph-flag" hidden>Ilustração em produção</span>
+      </div>
+    `;
+    const img = card.querySelector('img');
+    const flag = card.querySelector('.ph-flag');
+    if(!s.arquivo){
+      // ainda não há ilustração cadastrada para esta espécie
+      flag.hidden = false;
+      card.classList.add('is-placeholder');
+    } else {
+      // arquivo cadastrado, mas mostra o selo se o link quebrar
+      // (ex: arquivo renomeado/removido no GitHub)
+      img.addEventListener('error', () => {
+        flag.hidden = false;
+        card.classList.add('is-placeholder');
+      }, { once:true });
+    }
+
+    card.addEventListener('click', () => openModal(s, url, GROUPS[key].title));
+    card.addEventListener('keydown', (e) => {
+      if(e.key === 'Enter' || e.key === ' '){
+        e.preventDefault();
+        openModal(s, url, GROUPS[key].title);
+      }
+    });
+
+    grid.appendChild(card);
+  });
+
+  main.appendChild(section);
+});
+
+/* ===========================================================
+   MODAL — FICHA COMPLETA DA ESPÉCIE
+   -----------------------------------------------------------
+   Ao clicar num card, abre um painel com:
+   - ilustração em tamanho grande
+   - uma foto real aleatória da espécie, via API pública do
+     iNaturalist (busca de novo a cada abertura)
+   - um mapa do Brasil com pontos de ocorrência reais da
+     espécie, via API pública do GBIF (Global Biodiversity
+     Information Facility)
+   =========================================================== */
+
+const modalOverlay   = document.getElementById('modalOverlay');
+const modalClose     = document.getElementById('modalClose');
+const modalIllustr   = document.getElementById('modalIllustration');
+const modalGroupTag  = document.getElementById('modalGroupTag');
+const modalName      = document.getElementById('modalName');
+const modalSci       = document.getElementById('modalSci');
+const modalDesc      = document.getElementById('modalDesc');
+const modalPhotoBadge= document.getElementById('modalPhotoBadge');
+const modalRealPhoto = document.getElementById('modalRealPhoto');
+const modalPhotoCredit = document.getElementById('modalPhotoCredit');
+const modalMapEl     = document.getElementById('modalMap');
+
+let mapRequestToken = 0;   // evita corrida entre requisições de mapa
+let photoRequestToken = 0; // evita corrida entre requisições de foto
+
+function openModal(s, illustrationUrl, groupTitle){
+  modalGroupTag.innerHTML = groupTitle;
+  modalName.textContent = s.nome;
+  modalSci.textContent = s.cientifico;
+  modalDesc.textContent = LOREM;
+
+  modalIllustr.src = illustrationUrl;
+  modalIllustr.alt = `Ilustração de ${s.nome} (${s.cientifico})`;
+  modalIllustr.onerror = () => { modalIllustr.onerror = null; modalIllustr.src = placeholderSVG(s.nome); };
+
+  modalOverlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
+
+  loadRealPhoto(s.cientifico);
+  loadOccurrenceMap(s.cientifico);
+}
+
+function closeModal(){
+  modalOverlay.classList.remove('open');
+  document.body.style.overflow = '';
+}
+modalClose.addEventListener('click', closeModal);
+modalOverlay.addEventListener('click', (e) => { if(e.target === modalOverlay) closeModal(); });
+document.addEventListener('keydown', (e) => { if(e.key === 'Escape' && modalOverlay.classList.contains('open')) closeModal(); });
+
+/* ---------- Foto real via iNaturalist (aleatória a cada abertura) ---------- */
+async function loadRealPhoto(sciName){
+  const myToken = ++photoRequestToken;
+  modalPhotoBadge.classList.add('loading');
+  modalPhotoBadge.classList.remove('empty');
+  modalRealPhoto.removeAttribute('src');
+  modalPhotoCredit.textContent = 'Buscando foto…';
+
+  try{
+    const taxonRes = await fetch(`https://api.inaturalist.org/v1/taxa?q=${encodeURIComponent(sciName)}&rank=species&per_page=1`);
+    const taxonData = await taxonRes.json();
+    const taxon = taxonData.results && taxonData.results[0];
+    if(myToken !== photoRequestToken) return;
+    if(!taxon) throw new Error('taxon não encontrado');
+
+    let obsRes = await fetch(`https://api.inaturalist.org/v1/observations?taxon_id=${taxon.id}&photos=true&per_page=50&quality_grade=research&order_by=created_at`);
+    let obsData = await obsRes.json();
+    let candidates = (obsData.results || []).filter(o => o.photos && o.photos.length);
+
+    if(!candidates.length){
+      obsRes = await fetch(`https://api.inaturalist.org/v1/observations?taxon_id=${taxon.id}&photos=true&per_page=50&order_by=created_at`);
+      obsData = await obsRes.json();
+      candidates = (obsData.results || []).filter(o => o.photos && o.photos.length);
+    }
+    if(myToken !== photoRequestToken) return;
+    if(!candidates.length) throw new Error('sem fotos');
+
+    const obs = candidates[Math.floor(Math.random() * candidates.length)];
+    const photo = obs.photos[0];
+    const url = (photo.url || '').replace('square', 'medium');
+    const author = obs.user ? (obs.user.name || obs.user.login) : 'iNaturalist';
+    const license = photo.license_code ? photo.license_code.toUpperCase() : 'todos os direitos reservados';
+
+    modalRealPhoto.src = url;
+    modalPhotoCredit.innerHTML = `${author} · <a href="https://www.inaturalist.org/observations/${obs.id}" target="_blank" rel="noopener" style="color:inherit;">iNaturalist</a> (${license})`;
+    modalPhotoBadge.classList.remove('loading');
+  }catch(err){
+    if(myToken !== photoRequestToken) return;
+    modalPhotoBadge.classList.remove('loading');
+    modalPhotoBadge.classList.add('empty');
+    modalPhotoCredit.textContent = 'Sem foto disponível no iNaturalist';
+  }
+}
+
+/* ---------- Mapa de ocorrência via GBIF + silhueta do Brasil via D3/TopoJSON ---------- */
+let brazilFeaturePromise = null;
+function getBrazilFeature(){
+  if(!brazilFeaturePromise){
+    brazilFeaturePromise = fetch('https://unpkg.com/world-atlas@2/countries-110m.json')
+      .then(r => r.json())
+      .then(topo => {
+        const countries = topojson.feature(topo, topo.objects.countries);
+        return countries.features.find(f => f.id === '076');
+      });
+  }
+  return brazilFeaturePromise;
+}
+
+async function loadOccurrenceMap(sciName){
+  const myToken = ++mapRequestToken;
+  modalMapEl.innerHTML = '<span class="map-loading">Carregando mapa…</span>';
+
+  let feature;
+  try{
+    feature = await getBrazilFeature();
+  }catch(err){
+    if(myToken !== mapRequestToken) return;
+    modalMapEl.innerHTML = '<span class="map-loading">Não foi possível carregar o mapa.</span>';
+    return;
+  }
+  if(myToken !== mapRequestToken || !feature) return;
+
+  const width = modalMapEl.clientWidth || 216;
+  const height = 260;
+  const projection = d3.geoMercator().fitSize([width, height], feature);
+  const path = d3.geoPath(projection);
+
+  const svg = d3.create('svg').attr('viewBox', `0 0 ${width} ${height}`).attr('width', '100%').attr('height', height);
+  svg.append('path').datum(feature).attr('d', path).attr('fill', '#284d29').attr('stroke', '#7ea854').attr('stroke-width', 1);
+
+  modalMapEl.innerHTML = '';
+  modalMapEl.appendChild(svg.node());
+
+  try{
+    const occRes = await fetch(`https://api.gbif.org/v1/occurrence/search?scientificName=${encodeURIComponent(sciName)}&country=BR&hasCoordinate=true&limit=300`);
+    const occData = await occRes.json();
+    if(myToken !== mapRequestToken) return;
+
+    const points = (occData.results || [])
+      .map(o => [o.decimalLongitude, o.decimalLatitude])
+      .filter(([lon, lat]) => typeof lon === 'number' && typeof lat === 'number');
+
+    if(!points.length){
+      const note = document.createElement('p');
+      note.className = 'map-empty-note';
+      note.textContent = 'Sem registros públicos suficientes no GBIF para esta espécie no momento.';
+      modalMapEl.appendChild(note);
+      return;
+    }
+
+    const dotsG = svg.append('g');
+    points.forEach(([lon, lat]) => {
+      const p = projection([lon, lat]);
+      if(!p) return;
+      dotsG.append('circle')
+        .attr('cx', p[0]).attr('cy', p[1]).attr('r', 2.3)
+        .attr('fill', '#c79a2e').attr('fill-opacity', 0.75)
+        .attr('stroke', '#1e3820').attr('stroke-width', 0.4);
+    });
+  }catch(err){
+    if(myToken !== mapRequestToken) return;
+    const note = document.createElement('p');
+    note.className = 'map-empty-note';
+    note.textContent = 'Não foi possível carregar os pontos de ocorrência agora.';
+    modalMapEl.appendChild(note);
+  }
+}
+
+/* ---------- FILTROS ---------- */
+const chips = document.querySelectorAll('.chip');
+chips.forEach(chip => {
+  chip.addEventListener('click', () => {
+    chips.forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    const filter = chip.dataset.filter;
+    document.querySelectorAll('.group').forEach(group => {
+      group.style.display = (filter === 'all' || group.dataset.group === filter) ? '' : 'none';
+    });
+  });
+});
+</script>
+</body>
+
+  
+</html>
