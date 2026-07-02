@@ -1260,6 +1260,46 @@ function fileURL(filename){
   return GITHUB_RAW_BASE + filename.split('/').map(encodeURIComponent).join('/');
 }
 
+/* ---------- LISTA FIXA (SEMPRE FUNCIONA, SEM DEPENDER DE REDE) ----------
+   jsDelivr e a API do GitHub às vezes falham: o jsDelivr cacheia a
+   branch "main" por até 7 dias e demora pra "descobrir" arquivos
+   novos, e a API do GitHub tem limite de 60 requisições/hora por IP,
+   fácil de estourar. Por isso, os arquivos que JÁ SABEMOS que existem
+   na pasta /Ilustracoes ficam listados aqui embaixo — assim eles
+   aparecem imediatamente, sem depender de nenhum serviço externo.
+
+   A busca automática (mais abaixo) continua rodando por trás e SOMA
+   a essa lista qualquer arquivo novo que você subir depois, sem
+   precisar editar nada aqui — isto é só uma "garantia" para os que
+   já existem hoje. */
+const STATIC_ILLUSTRATIONS = [
+  "Anta-brasileira.png",
+  "Cachorro vinagre.png",
+  "Caxinguele.png",
+  "Chrotopterus auritus.png",
+  "Gambá-orelha-branca.png",
+  "Gato-do-mato-do-sul.png",
+  "Gracilinanus agilis.png",
+  "Graxaim.png",
+  "Morcego-pescador.png",
+  "Onça-parda.png",
+  "Ouriço-preto.png",
+  "Quati.png",
+  "Veado-catingueiro.png",
+  "irara.png",
+  "jaguatirica.png",
+  "macaco prego.png",
+  "mao pelada.png",
+  "tamandua mirim.png",
+];
+function staticIllustrationIndex(){
+  const map = {};
+  STATIC_ILLUSTRATIONS.forEach(filename => {
+    map[normalizeName(stripExt(filename))] = fileURL(filename);
+  });
+  return new Map(Object.entries(map));
+}
+
 /* Normaliza um nome (de espécie ou de arquivo) para comparação:
    remove acentos, baixa a caixa, troca hífen/underscore por
    espaço e colapsa espaços — assim "Anta-brasileira",
@@ -1450,11 +1490,9 @@ Object.keys(GROUPS).forEach(key => {
    Busca a listagem da pasta /Ilustracoes e, para cada espécie,
    procura um arquivo cujo nome (normalizado) seja idêntico ao
    nome científico OU ao nome popular — nessa ordem de prioridade. */
-async function matchIllustrations(){
-  const index = await fetchIllustrationIndex();
-  if(!index) return; // API indisponível: mantém os placeholders
-
+function applyIndexToCards(index){
   cardRegistry.forEach(entry => {
+    if(entry.matched) return; // já resolvido (pela lista fixa ou por uma rodada anterior)
     const sciKey  = normalizeName(entry.species.cientifico);
     const nomeKey = normalizeName(entry.species.nome);
     const matchUrl = index.get(sciKey) || index.get(nomeKey);
@@ -1480,6 +1518,20 @@ async function matchIllustrations(){
   const matchedCount = cardRegistry.filter(e => e.matched).length;
   document.getElementById('progressCount').textContent = `${matchedCount}/${cardRegistry.length}`;
   document.getElementById('progressFill').style.width = (matchedCount / cardRegistry.length * 100) + '%';
+}
+
+async function matchIllustrations(){
+  // 1) Aplica a lista fixa IMEDIATAMENTE — não depende de rede nenhuma,
+  //    então as ilustrações já conhecidas aparecem na hora, mesmo que
+  //    jsDelivr e a API do GitHub estejam fora do ar ou com limite excedido.
+  applyIndexToCards(staticIllustrationIndex());
+
+  // 2) Em segundo plano, tenta descobrir arquivos NOVOS (que ainda não
+  //    estão na lista fixa acima) via jsDelivr / API do GitHub. Se falhar,
+  //    não tem problema: os que já foram casados no passo 1 continuam.
+  const index = await fetchIllustrationIndex();
+  if(!index) return;
+  applyIndexToCards(index);
 }
 matchIllustrations();
 
