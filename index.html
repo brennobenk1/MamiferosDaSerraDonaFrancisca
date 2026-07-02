@@ -114,6 +114,21 @@
     border-radius:999px;
     padding:6px 14px;
   }
+  .catalog-btn{
+    border:1px solid var(--gold) !important;
+    background:var(--gold);
+    color:var(--forest-deep) !important;
+    font-weight:700;
+    text-decoration:none;
+    cursor:pointer;
+    transition:transform .18s ease, box-shadow .18s ease, background .18s ease;
+    box-shadow:0 8px 20px -8px rgba(199,154,46,.6);
+  }
+  .catalog-btn:hover{
+    background:#e0b23c;
+    transform:translateY(-2px);
+    box-shadow:0 12px 26px -8px rgba(199,154,46,.75);
+  }
   .hero-eyebrow{
     font-size:1.5rem;
     display:block;
@@ -564,11 +579,40 @@
     grid-template-columns: 260px 1fr;
   }
   .modal-map{
+    position:relative;
     background:var(--forest-deep);
     padding:26px 22px;
     display:flex;
     flex-direction:column;
     color:var(--cream);
+    overflow:hidden;
+  }
+  .modal-map::before,
+  .modal-map::after{
+    content:"";
+    position:absolute;
+    left:0;
+    width:140%;
+    pointer-events:none;
+  }
+  .modal-map::before{
+    top:-10%;
+    height:46%;
+    background:var(--forest);
+    opacity:.5;
+    clip-path: polygon(0% 0%, 100% 0%, 100% 38%, 92% 45%, 84% 40%, 74% 52%, 63% 44%, 52% 58%, 41% 48%, 30% 60%, 20% 50%, 9% 62%, 0% 52%);
+  }
+  .modal-map::after{
+    bottom:-14%;
+    height:40%;
+    background:var(--forest-deep);
+    opacity:.65;
+    transform:scaleY(-1);
+    clip-path: polygon(0% 0%, 100% 0%, 100% 20%, 88% 30%, 78% 22%, 66% 34%, 55% 24%, 44% 36%, 33% 26%, 22% 38%, 10% 28%, 0% 34%);
+  }
+  .modal-map > *{
+    position:relative;
+    z-index:2;
   }
   .map-head{margin-bottom:14px;}
   .map-head .mono{font-size:.65rem; color:var(--forest-light);}
@@ -624,6 +668,34 @@
     align-items:center;
     justify-content:center;
     min-height:280px;
+  }
+  .modal-illustration::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:
+      radial-gradient(900px 400px at 15% -20%, rgba(126,168,84,.32), transparent 60%),
+      radial-gradient(700px 400px at 100% 110%, rgba(199,154,46,.16), transparent 55%);
+    pointer-events:none;
+  }
+  .modal-illustration::after{
+    content:"";
+    position:absolute;
+    left:-10%;
+    bottom:-8%;
+    width:120%;
+    height:34%;
+    background:var(--forest);
+    opacity:.35;
+    clip-path: polygon(0% 100%, 100% 100%, 100% 62%, 92% 55%, 84% 60%, 74% 48%, 63% 56%, 52% 42%, 41% 52%, 30% 40%, 20% 50%, 9% 38%, 0% 48%);
+    pointer-events:none;
+  }
+  .modal-illustration img#modalIllustration{
+    position:relative;
+    z-index:2;
+  }
+  .modal-illustration .modal-photo-badge{
+    z-index:3;
   }
   .modal-illustration img#modalIllustration{
     width:100%;
@@ -706,6 +778,7 @@
   <div class="hero-inner">
     <div class="brand-row">
       <span class="tag">APA Dona Francisca · Joinville, SC</span>
+      <a href="#especies" class="tag catalog-btn">Catálogo</a>
       <span class="tag">Educação ambiental &amp; ilustração científica</span>
     </div>
     <span class="eyebrow hero-eyebrow">Cartilha</span>
@@ -908,7 +981,6 @@ const SPECIES = [
   { nome:"Furão-pequeno", cientifico:"Galictis cuja", grupo:"mustelideos" },
   { nome:"Gato-do-mato", cientifico:"Leopardus tigrinus", grupo:"felinos" },
   { nome:"Gato-mourisco", cientifico:"Herpailurus yagouaroundi", grupo:"felinos" },
-  { nome:"Gavião-carijó", cientifico:"Rupornis magnirostris", grupo:"outros" },
   { nome:"Graxaim-do-campo", cientifico:"Lycalopex gymnocercus", grupo:"canideos" },
   { nome:"Onça-pintada", cientifico:"Panthera onca", grupo:"felinos" },
   { nome:"Paca", cientifico:"Cuniculus paca", grupo:"roedores" },
@@ -1016,6 +1088,13 @@ Object.keys(GROUPS).forEach(key => {
   main.appendChild(section);
 });
 
+// Começa a buscar, em segundo plano, a foto real e o mapa de
+// ocorrência de todas as espécies — assim a ficha de cada uma já
+// abre pronta, sem o usuário precisar esperar.
+// (setTimeout garante que todo o restante do script já foi
+// carregado antes de disparar o pré-carregamento)
+setTimeout(preloadAllSpeciesData, 0);
+
 /* ===========================================================
    MODAL — FICHA COMPLETA DA ESPÉCIE
    -----------------------------------------------------------
@@ -1060,28 +1139,22 @@ function openModal(s, illustrationUrl, groupTitle){
   loadOccurrenceMap(s.cientifico);
 }
 
-function closeModal(){
-  modalOverlay.classList.remove('open');
-  document.body.style.overflow = '';
-}
-modalClose.addEventListener('click', closeModal);
-modalOverlay.addEventListener('click', (e) => { if(e.target === modalOverlay) closeModal(); });
-document.addEventListener('keydown', (e) => { if(e.key === 'Escape' && modalOverlay.classList.contains('open')) closeModal(); });
+/* ---------- PRÉ-CARREGAMENTO ----------
+   Busca, em segundo plano, a foto real (iNaturalist) e os pontos de
+   ocorrência (GBIF) de TODAS as espécies assim que a página carrega,
+   guardando o resultado em cache. Assim, quando o usuário clica num
+   card, a ficha já abre com o mapa e a foto prontos, sem espera.
+   Um limite de requisições simultâneas evita sobrecarregar as APIs
+   públicas. */
+const photoDataCache = new Map();      // sciName -> Promise<{url,author,license,obsId} | null>
+const occurrenceDataCache = new Map(); // sciName -> Promise<Array<[lon,lat]> | null>
 
-/* ---------- Foto real via iNaturalist (aleatória a cada abertura) ---------- */
-async function loadRealPhoto(sciName){
-  const myToken = ++photoRequestToken;
-  modalPhotoBadge.classList.add('loading');
-  modalPhotoBadge.classList.remove('empty');
-  modalRealPhoto.removeAttribute('src');
-  modalPhotoCredit.textContent = 'Buscando foto…';
-
+async function fetchPhotoData(sciName){
   try{
     const taxonRes = await fetch(`https://api.inaturalist.org/v1/taxa?q=${encodeURIComponent(sciName)}&rank=species&per_page=1`);
     const taxonData = await taxonRes.json();
     const taxon = taxonData.results && taxonData.results[0];
-    if(myToken !== photoRequestToken) return;
-    if(!taxon) throw new Error('taxon não encontrado');
+    if(!taxon) return null;
 
     let obsRes = await fetch(`https://api.inaturalist.org/v1/observations?taxon_id=${taxon.id}&photos=true&per_page=50&quality_grade=research&order_by=created_at`);
     let obsData = await obsRes.json();
@@ -1092,8 +1165,7 @@ async function loadRealPhoto(sciName){
       obsData = await obsRes.json();
       candidates = (obsData.results || []).filter(o => o.photos && o.photos.length);
     }
-    if(myToken !== photoRequestToken) return;
-    if(!candidates.length) throw new Error('sem fotos');
+    if(!candidates.length) return null;
 
     const obs = candidates[Math.floor(Math.random() * candidates.length)];
     const photo = obs.photos[0];
@@ -1101,15 +1173,101 @@ async function loadRealPhoto(sciName){
     const author = obs.user ? (obs.user.name || obs.user.login) : 'iNaturalist';
     const license = photo.license_code ? photo.license_code.toUpperCase() : 'todos os direitos reservados';
 
-    modalRealPhoto.src = url;
-    modalPhotoCredit.innerHTML = `${author} · <a href="https://www.inaturalist.org/observations/${obs.id}" target="_blank" rel="noopener" style="color:inherit;">iNaturalist</a> (${license})`;
-    modalPhotoBadge.classList.remove('loading');
+    // "pré-aquece" o cache de imagem do navegador
+    const preheat = new Image();
+    preheat.src = url;
+
+    return { url, author, license, obsId: obs.id };
   }catch(err){
-    if(myToken !== photoRequestToken) return;
+    return null;
+  }
+}
+
+function getPhotoData(sciName){
+  if(!photoDataCache.has(sciName)){
+    photoDataCache.set(sciName, fetchPhotoData(sciName));
+  }
+  return photoDataCache.get(sciName);
+}
+
+async function fetchOccurrenceData(sciName){
+  try{
+    const occRes = await fetch(`https://api.gbif.org/v1/occurrence/search?scientificName=${encodeURIComponent(sciName)}&country=BR&hasCoordinate=true&limit=300`);
+    const occData = await occRes.json();
+    const points = (occData.results || [])
+      .map(o => [o.decimalLongitude, o.decimalLatitude])
+      .filter(([lon, lat]) => typeof lon === 'number' && typeof lat === 'number');
+    return points;
+  }catch(err){
+    return null;
+  }
+}
+
+function getOccurrenceData(sciName){
+  if(!occurrenceDataCache.has(sciName)){
+    occurrenceDataCache.set(sciName, fetchOccurrenceData(sciName));
+  }
+  return occurrenceDataCache.get(sciName);
+}
+
+/* Executa uma lista de tarefas assíncronas com um limite de
+   concorrência, para não disparar dezenas de requisições de uma vez. */
+async function runWithConcurrency(tasks, limit){
+  let i = 0;
+  const workers = new Array(Math.min(limit, tasks.length)).fill(0).map(async () => {
+    while(i < tasks.length){
+      const idx = i++;
+      try{ await tasks[idx](); }catch(e){ /* ignora falhas individuais */ }
+    }
+  });
+  await Promise.all(workers);
+}
+
+function preloadAllSpeciesData(){
+  // silhueta do Brasil primeiro, é compartilhada por todos os mapas
+  getBrazilFeature();
+
+  const tasks = [];
+  SPECIES.forEach(s => {
+    tasks.push(() => getPhotoData(s.cientifico));
+    tasks.push(() => getOccurrenceData(s.cientifico));
+  });
+  runWithConcurrency(tasks, 5);
+}
+
+function closeModal(){
+  modalOverlay.classList.remove('open');
+  document.body.style.overflow = '';
+}
+modalClose.addEventListener('click', closeModal);
+modalOverlay.addEventListener('click', (e) => { if(e.target === modalOverlay) closeModal(); });
+document.addEventListener('keydown', (e) => { if(e.key === 'Escape' && modalOverlay.classList.contains('open')) closeModal(); });
+
+/* ---------- Foto real via iNaturalist ----------
+   Usa o cache pré-carregado (getPhotoData). Se por algum motivo a
+   espécie ainda não tiver terminado de carregar em segundo plano,
+   mostra o estado de "buscando" e aguarda a mesma Promise — nunca
+   dispara uma busca duplicada. */
+async function loadRealPhoto(sciName){
+  const myToken = ++photoRequestToken;
+  modalPhotoBadge.classList.add('loading');
+  modalPhotoBadge.classList.remove('empty');
+  modalRealPhoto.removeAttribute('src');
+  modalPhotoCredit.textContent = 'Buscando foto…';
+
+  const data = await getPhotoData(sciName);
+  if(myToken !== photoRequestToken) return;
+
+  if(!data){
     modalPhotoBadge.classList.remove('loading');
     modalPhotoBadge.classList.add('empty');
     modalPhotoCredit.textContent = 'Sem foto disponível no iNaturalist';
+    return;
   }
+
+  modalRealPhoto.src = data.url;
+  modalPhotoCredit.innerHTML = `${data.author} · <a href="https://www.inaturalist.org/observations/${data.obsId}" target="_blank" rel="noopener" style="color:inherit;">iNaturalist</a> (${data.license})`;
+  modalPhotoBadge.classList.remove('loading');
 }
 
 /* ---------- Mapa de ocorrência via GBIF + silhueta do Brasil via D3/TopoJSON ---------- */
@@ -1151,39 +1309,34 @@ async function loadOccurrenceMap(sciName){
   modalMapEl.innerHTML = '';
   modalMapEl.appendChild(svg.node());
 
-  try{
-    const occRes = await fetch(`https://api.gbif.org/v1/occurrence/search?scientificName=${encodeURIComponent(sciName)}&country=BR&hasCoordinate=true&limit=300`);
-    const occData = await occRes.json();
-    if(myToken !== mapRequestToken) return;
+  const points = await getOccurrenceData(sciName);
+  if(myToken !== mapRequestToken) return;
 
-    const points = (occData.results || [])
-      .map(o => [o.decimalLongitude, o.decimalLatitude])
-      .filter(([lon, lat]) => typeof lon === 'number' && typeof lat === 'number');
-
-    if(!points.length){
-      const note = document.createElement('p');
-      note.className = 'map-empty-note';
-      note.textContent = 'Sem registros públicos suficientes no GBIF para esta espécie no momento.';
-      modalMapEl.appendChild(note);
-      return;
-    }
-
-    const dotsG = svg.append('g');
-    points.forEach(([lon, lat]) => {
-      const p = projection([lon, lat]);
-      if(!p) return;
-      dotsG.append('circle')
-        .attr('cx', p[0]).attr('cy', p[1]).attr('r', 2.3)
-        .attr('fill', '#c79a2e').attr('fill-opacity', 0.75)
-        .attr('stroke', '#1e3820').attr('stroke-width', 0.4);
-    });
-  }catch(err){
-    if(myToken !== mapRequestToken) return;
+  if(points === null){
     const note = document.createElement('p');
     note.className = 'map-empty-note';
     note.textContent = 'Não foi possível carregar os pontos de ocorrência agora.';
     modalMapEl.appendChild(note);
+    return;
   }
+
+  if(!points.length){
+    const note = document.createElement('p');
+    note.className = 'map-empty-note';
+    note.textContent = 'Sem registros públicos suficientes no GBIF para esta espécie no momento.';
+    modalMapEl.appendChild(note);
+    return;
+  }
+
+  const dotsG = svg.append('g');
+  points.forEach(([lon, lat]) => {
+    const p = projection([lon, lat]);
+    if(!p) return;
+    dotsG.append('circle')
+      .attr('cx', p[0]).attr('cy', p[1]).attr('r', 2.3)
+      .attr('fill', '#c79a2e').attr('fill-opacity', 0.75)
+      .attr('stroke', '#1e3820').attr('stroke-width', 0.4);
+  });
 }
 
 /* ---------- FILTROS ---------- */
