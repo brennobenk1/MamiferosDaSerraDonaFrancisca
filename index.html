@@ -1,6 +1,21 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
+<script>
+/* Evita que o navegador pule direto para uma seção (ex.: #especies)
+   ao carregar/recarregar a página, o que fazia o site "abrir" já
+   dentro do catálogo, sem mostrar a capa. Guardamos o hash original
+   e removemos da URL antes do navegador processar o salto nativo;
+   depois que a página termina de montar tudo, se havia um destino
+   pedido de propósito, rolamos até ele suavemente. */
+(function(){
+  if('scrollRestoration' in history){ history.scrollRestoration = 'manual'; }
+  window.__deepLinkHash = window.location.hash || '';
+  if(window.__deepLinkHash){
+    history.replaceState(null, '', window.location.pathname + window.location.search);
+  }
+})();
+</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Mamíferos da Serra Dona Francisca — Cartilha</title>
@@ -1277,6 +1292,7 @@ const STATIC_ILLUSTRATIONS = [
   "Cachorro vinagre.png",
   "Caxinguele.png",
   "Chrotopterus auritus.png",
+  "Chrysocyon brachyurus.png",
   "Gambá-orelha-branca.png",
   "Gato-do-mato-do-sul.png",
   "Gracilinanus agilis.png",
@@ -1866,6 +1882,23 @@ window.addEventListener('scroll', () => {
   toTopBtn.classList.toggle('show', window.scrollY > 700);
 }, { passive:true });
 toTopBtn.addEventListener('click', () => window.scrollTo({ top:0, behavior:'smooth' }));
+
+/* ---------- LINK DIRETO PARA UMA SEÇÃO (ex.: #especies) ----------
+   Se a página foi aberta com um link direto para uma seção (o botão
+   "Catálogo" gera algo como .../#especies), a gente NÃO deixa o
+   navegador pular pra lá instantaneamente (isso fazia a página abrir
+   já dentro do catálogo, sem mostrar a capa nem carregar o conteúdo).
+   Em vez disso, espera tudo carregar e rola suavemente até o
+   destino — assim quem recebe o link ainda chega direto na seção
+   certa, só que de um jeito mais bonito e sem susto. */
+window.addEventListener('load', () => {
+  const hash = window.__deepLinkHash;
+  if(!hash) return;
+  setTimeout(() => {
+    const target = document.querySelector(hash);
+    if(target) target.scrollIntoView({ behavior:'smooth', block:'start' });
+  }, 400);
+});
 </script>
 </body>
 </html>
