@@ -993,6 +993,93 @@
     margin-bottom:10px;
   }
 
+  /* ---------- Comparativo de tamanho (homem de 1,70m) ---------- */
+  .compare-toggle{
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    border:1px solid rgba(61,107,44,.35);
+    background:rgba(61,107,44,.08);
+    color:var(--forest);
+    border-radius:999px;
+    padding:7px 14px;
+    cursor:pointer;
+    font-family:'Space Mono',monospace;
+    font-size:.68rem;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    margin:2px 0 4px;
+    transition:border-color .18s ease, background .18s ease, color .18s ease, transform .12s ease;
+  }
+  .compare-toggle:hover{border-color:var(--gold); color:var(--bark); background:rgba(199,154,46,.14); transform:translateY(-1px);}
+  .compare-toggle.active{background:var(--forest); color:var(--cream); border-color:var(--forest);}
+  html[data-theme="dark"] .compare-toggle{color:var(--forest-light); border-color:rgba(126,168,84,.4); background:rgba(126,168,84,.1);}
+  html[data-theme="dark"] .compare-toggle.active{background:var(--forest-light); color:var(--forest-deep); border-color:var(--forest-light);}
+
+  .modal-illustration.comparing img#modalIllustration{display:none;}
+  .compare-stage{
+    display:none;
+    position:relative;
+    z-index:2;
+    width:100%;
+    height:100%;
+    align-items:flex-end;
+    justify-content:center;
+    gap:clamp(18px, 6vw, 46px);
+    padding:20px 14px 34px;
+  }
+  .modal-illustration.comparing .compare-stage{display:flex;}
+  .compare-figure{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:8px;
+    animation:compareIn .45s cubic-bezier(.2,.8,.25,1) both;
+  }
+  .compare-figure.animal{animation-delay:.08s;}
+  @keyframes compareIn{
+    from{opacity:0; transform:translateY(14px) scale(.85);}
+    to{opacity:1; transform:none;}
+  }
+  .compare-figure svg{display:block; color:var(--ink-soft);}
+  html[data-theme="dark"] .compare-figure svg{color:rgba(246,241,228,.82);}
+  .compare-figure img{
+    display:block;
+    object-fit:contain;
+    max-width:44vw;
+    filter:drop-shadow(0 6px 10px rgba(0,0,0,.25));
+    transition:height .35s cubic-bezier(.2,.8,.25,1), width .35s cubic-bezier(.2,.8,.25,1);
+  }
+  .compare-label{
+    font-family:'Space Mono',monospace;
+    font-size:.68rem;
+    letter-spacing:.04em;
+    color:var(--ink-soft);
+    background:rgba(251,248,241,.9);
+    padding:3px 9px;
+    border-radius:999px;
+    white-space:nowrap;
+  }
+  html[data-theme="dark"] .compare-label{background:rgba(30,56,32,.75); color:var(--cream);}
+  .compare-ground{
+    display:none;
+    position:absolute;
+    left:6%;
+    right:6%;
+    bottom:26px;
+    height:2px;
+    background:linear-gradient(90deg, transparent, var(--gold), transparent);
+    opacity:.55;
+    z-index:1;
+  }
+  .modal-illustration.comparing .compare-ground{display:block;}
+  .compare-caption{
+    font-size:.72rem;
+    color:var(--ink-soft);
+    margin-top:8px;
+    opacity:.85;
+  }
+
   @media (max-width:720px){
     .modal-overlay{padding:0; align-items:flex-end;}
     .modal-card{
@@ -1139,18 +1226,40 @@
         <p class="map-caption">Pontos com base em registros públicos da espécie no <a href="https://www.gbif.org" target="_blank" rel="noopener" style="color:inherit;">GBIF.org</a>. Mostra onde a espécie já foi observada, não uma área contínua de distribuição.</p>
       </div>
       <div class="modal-main">
-        <div class="modal-illustration">
+        <div class="modal-illustration" id="modalIllustrationWrap">
           <img id="modalIllustration" src="" alt="">
           <div class="modal-photo-badge loading" id="modalPhotoBadge">
             <img id="modalRealPhoto" src="" alt="Foto real da espécie via iNaturalist">
             <span class="modal-photo-credit" id="modalPhotoCredit">Buscando foto…</span>
+          </div>
+          <div class="compare-ground"></div>
+          <div class="compare-stage" id="compareStage">
+            <div class="compare-figure human">
+              <svg id="compareHumanSvg" viewBox="0 0 100 320" width="70">
+                <circle cx="50" cy="34" r="30" fill="currentColor"/>
+                <rect x="20" y="68" width="60" height="112" rx="26" fill="currentColor"/>
+                <rect x="4"  y="78" width="18" height="92" rx="9" fill="currentColor"/>
+                <rect x="78" y="78" width="18" height="92" rx="9" fill="currentColor"/>
+                <rect x="26" y="176" width="20" height="142" rx="10" fill="currentColor"/>
+                <rect x="54" y="176" width="20" height="142" rx="10" fill="currentColor"/>
+              </svg>
+              <span class="compare-label">Pessoa · 1,70 m</span>
+            </div>
+            <div class="compare-figure animal">
+              <img id="compareAnimalImg" src="" alt="">
+              <span class="compare-label" id="compareAnimalLabel"></span>
+            </div>
           </div>
         </div>
         <div class="modal-info">
           <span class="card-tag" id="modalGroupTag"></span>
           <h2 id="modalName"></h2>
           <span class="sci" id="modalSci"></span>
+          <button class="compare-toggle" id="compareToggle" type="button" aria-pressed="false">
+            🧍 Ligar comparativo (1,70 m)
+          </button>
           <p id="modalDesc"></p>
+          <p class="compare-caption" id="compareCaption" style="display:none;"></p>
         </div>
       </div>
     </div>
@@ -1235,43 +1344,43 @@ const GROUPS = {
 };
 
 const SPECIES = [
-  { nome:"Anta-brasileira", cientifico:"Tapirus terrestris", grupo:"ungulados" },
-  { nome:"Cuíca-graciosa", cientifico:"Gracilinanus agilis", grupo:"marsupiais" },
-  { nome:"Caxinguelê", cientifico:"Sciurus aestuans", grupo:"roedores" },
-  { nome:"Cachorro-vinagre", cientifico:"Speothos venaticus", grupo:"canideos" },
-  { nome:"Gambá-orelha-branca", cientifico:"Didelphis albiventris", grupo:"marsupiais" },
-  { nome:"Graxaim", cientifico:"Cerdocyon thous", grupo:"canideos" },
-  { nome:"Irara", cientifico:"Eira barbara", grupo:"mustelideos" },
-  { nome:"Jaguatirica", cientifico:"Leopardus pardalis", grupo:"felinos" },
-  { nome:"Macaco-prego", cientifico:"Sapajus nigritus", grupo:"primatas" },
-  { nome:"Mão-pelada", cientifico:"Procyon cancrivorus", grupo:"mustelideos" },
-  { nome:"Morcego-pescador", cientifico:"Noctilio leporinus", grupo:"morcegos" },
-  { nome:"Morcego-bombachudo", cientifico:"Chrotopterus auritus", grupo:"morcegos" },
-  { nome:"Onça-parda", cientifico:"Puma concolor", grupo:"felinos" },
-  { nome:"Ouriço-preto", cientifico:"Chaetomys subspinosus", grupo:"roedores" },
-  { nome:"Quati", cientifico:"Nasua nasua", grupo:"mustelideos" },
-  { nome:"Tamanduá-mirim", cientifico:"Tamandua tetradactyla", grupo:"xenartros" },
-  { nome:"Veado-catingueiro", cientifico:"Mazama sp.", grupo:"ungulados" },
-  { nome:"Gato-do-mato-do-sul", cientifico:"Leopardus guttulus", grupo:"felinos" },
-  { nome:"Lobo-guará", cientifico:"Chrysocyon brachyurus", grupo:"canideos" },
-  { nome:"Gato-maracajá", cientifico:"Leopardus wiedii", grupo:"felinos" },
-  { nome:"Lontra", cientifico:"Lontra longicaudis", grupo:"mustelideos" },
-  { nome:"Ratão-do-banhado", cientifico:"Myocastor coypus", grupo:"roedores" },
-  { nome:"Gambá-orelha-preta", cientifico:"Didelphis aurita", grupo:"marsupiais" },
-  { nome:"Bugio-ruivo", cientifico:"Alouatta clamitans", grupo:"primatas" },
-  { nome:"Capivara", cientifico:"Hydrochoerus hydrochaeris", grupo:"roedores" },
-  { nome:"Cateto", cientifico:"Pecari tajacu", grupo:"ungulados" },
-  { nome:"Cutia", cientifico:"Dasyprocta azarae", grupo:"roedores" },
-  { nome:"Furão-pequeno", cientifico:"Galictis cuja", grupo:"mustelideos" },
-  { nome:"Gato-do-mato", cientifico:"Leopardus tigrinus", grupo:"felinos" },
-  { nome:"Gato-mourisco", cientifico:"Herpailurus yagouaroundi", grupo:"felinos" },
-  { nome:"Graxaim-do-campo", cientifico:"Lycalopex gymnocercus", grupo:"canideos" },
-  { nome:"Onça-pintada", cientifico:"Panthera onca", grupo:"felinos" },
-  { nome:"Paca", cientifico:"Cuniculus paca", grupo:"roedores" },
-  { nome:"Preá", cientifico:"Cavia aperea", grupo:"roedores" },
-  { nome:"Tapiti", cientifico:"Sylvilagus brasiliensis", grupo:"outros" },
-  { nome:"Tatu-peba", cientifico:"Euphractus sexcinctus", grupo:"xenartros" },
-  { nome:"Zorrilho", cientifico:"Conepatus chinga", grupo:"mustelideos" },
+  { nome:"Anta-brasileira", cientifico:"Tapirus terrestris", grupo:"ungulados", tamanho:2.2 },
+  { nome:"Cuíca-graciosa", cientifico:"Gracilinanus agilis", grupo:"marsupiais", tamanho:0.22 },
+  { nome:"Caxinguelê", cientifico:"Sciurus aestuans", grupo:"roedores", tamanho:0.35 },
+  { nome:"Cachorro-vinagre", cientifico:"Speothos venaticus", grupo:"canideos", tamanho:0.75 },
+  { nome:"Gambá-orelha-branca", cientifico:"Didelphis albiventris", grupo:"marsupiais", tamanho:0.65 },
+  { nome:"Graxaim", cientifico:"Cerdocyon thous", grupo:"canideos", tamanho:1.0 },
+  { nome:"Irara", cientifico:"Eira barbara", grupo:"mustelideos", tamanho:1.05 },
+  { nome:"Jaguatirica", cientifico:"Leopardus pardalis", grupo:"felinos", tamanho:1.3 },
+  { nome:"Macaco-prego", cientifico:"Sapajus nigritus", grupo:"primatas", tamanho:0.85 },
+  { nome:"Mão-pelada", cientifico:"Procyon cancrivorus", grupo:"mustelideos", tamanho:0.9 },
+  { nome:"Morcego-pescador", cientifico:"Noctilio leporinus", grupo:"morcegos", tamanho:0.5 },
+  { nome:"Morcego-bombachudo", cientifico:"Chrotopterus auritus", grupo:"morcegos", tamanho:0.45 },
+  { nome:"Onça-parda", cientifico:"Puma concolor", grupo:"felinos", tamanho:2.0 },
+  { nome:"Ouriço-preto", cientifico:"Chaetomys subspinosus", grupo:"roedores", tamanho:0.55 },
+  { nome:"Quati", cientifico:"Nasua nasua", grupo:"mustelideos", tamanho:1.05 },
+  { nome:"Tamanduá-mirim", cientifico:"Tamandua tetradactyla", grupo:"xenartros", tamanho:1.2 },
+  { nome:"Veado-catingueiro", cientifico:"Mazama sp.", grupo:"ungulados", tamanho:1.1 },
+  { nome:"Gato-do-mato-do-sul", cientifico:"Leopardus guttulus", grupo:"felinos", tamanho:0.85 },
+  { nome:"Lobo-guará", cientifico:"Chrysocyon brachyurus", grupo:"canideos", tamanho:1.6 },
+  { nome:"Gato-maracajá", cientifico:"Leopardus wiedii", grupo:"felinos", tamanho:0.95 },
+  { nome:"Lontra", cientifico:"Lontra longicaudis", grupo:"mustelideos", tamanho:1.1 },
+  { nome:"Ratão-do-banhado", cientifico:"Myocastor coypus", grupo:"roedores", tamanho:0.9 },
+  { nome:"Gambá-orelha-preta", cientifico:"Didelphis aurita", grupo:"marsupiais", tamanho:0.65 },
+  { nome:"Bugio-ruivo", cientifico:"Alouatta clamitans", grupo:"primatas", tamanho:1.2 },
+  { nome:"Capivara", cientifico:"Hydrochoerus hydrochaeris", grupo:"roedores", tamanho:1.2 },
+  { nome:"Cateto", cientifico:"Pecari tajacu", grupo:"ungulados", tamanho:0.95 },
+  { nome:"Cutia", cientifico:"Dasyprocta azarae", grupo:"roedores", tamanho:0.55 },
+  { nome:"Furão-pequeno", cientifico:"Galictis cuja", grupo:"mustelideos", tamanho:0.55 },
+  { nome:"Gato-do-mato", cientifico:"Leopardus tigrinus", grupo:"felinos", tamanho:0.85 },
+  { nome:"Gato-mourisco", cientifico:"Herpailurus yagouaroundi", grupo:"felinos", tamanho:1.05 },
+  { nome:"Graxaim-do-campo", cientifico:"Lycalopex gymnocercus", grupo:"canideos", tamanho:1.0 },
+  { nome:"Onça-pintada", cientifico:"Panthera onca", grupo:"felinos", tamanho:2.4 },
+  { nome:"Paca", cientifico:"Cuniculus paca", grupo:"roedores", tamanho:0.75 },
+  { nome:"Preá", cientifico:"Cavia aperea", grupo:"roedores", tamanho:0.25 },
+  { nome:"Tapiti", cientifico:"Sylvilagus brasiliensis", grupo:"outros", tamanho:0.4 },
+  { nome:"Tatu-peba", cientifico:"Euphractus sexcinctus", grupo:"xenartros", tamanho:0.5 },
+  { nome:"Zorrilho", cientifico:"Conepatus chinga", grupo:"mustelideos", tamanho:0.55 },
 ];
 
 /* Monta a URL "raw" do GitHub a partir do nome exato do arquivo,
@@ -1568,6 +1677,7 @@ setTimeout(preloadAllSpeciesData, 0);
 const modalOverlay   = document.getElementById('modalOverlay');
 const modalClose     = document.getElementById('modalClose');
 const modalIllustr   = document.getElementById('modalIllustration');
+const modalIllustrWrap = document.getElementById('modalIllustrationWrap');
 const modalGroupTag  = document.getElementById('modalGroupTag');
 const modalName      = document.getElementById('modalName');
 const modalSci       = document.getElementById('modalSci');
@@ -1577,8 +1687,56 @@ const modalRealPhoto = document.getElementById('modalRealPhoto');
 const modalPhotoCredit = document.getElementById('modalPhotoCredit');
 const modalMapEl     = document.getElementById('modalMap');
 
-let mapRequestToken = 0;
-let photoRequestToken = 0;
+// ---- Comparativo de tamanho (pessoa de 1,70 m) ----
+const compareToggle   = document.getElementById('compareToggle');
+const compareStage    = document.getElementById('compareStage');
+const compareHumanSvg = document.getElementById('compareHumanSvg');
+const compareAnimalImg= document.getElementById('compareAnimalImg');
+const compareAnimalLabel = document.getElementById('compareAnimalLabel');
+const compareCaption  = document.getElementById('compareCaption');
+const HUMAN_HEIGHT_M  = 1.70;
+
+let currentSpecies = null;
+let comparing = false;
+
+function formatMeters(m){
+  return (m < 1 ? Math.round(m*100) + ' cm' : m.toFixed(2).replace(/0$/,'').replace(/\.$/,'') + ' m');
+}
+
+function applyComparisonScale(){
+  if(!currentSpecies || !currentSpecies.tamanho) return;
+  const rect = compareStage.getBoundingClientRect();
+  const availableH = Math.max(rect.height - 46, 90);
+  const humanPxHeight = Math.min(availableH * 0.82, 230);
+  const pxPerMeter = humanPxHeight / HUMAN_HEIGHT_M;
+  const animalPxHeight = Math.min(Math.max(currentSpecies.tamanho * pxPerMeter, 22), availableH);
+
+  compareHumanSvg.style.height = humanPxHeight + 'px';
+  compareHumanSvg.style.width = 'auto';
+  compareAnimalImg.style.height = animalPxHeight + 'px';
+  compareAnimalImg.style.width = 'auto';
+}
+
+function setComparing(on){
+  comparing = on;
+  modalIllustrWrap.classList.toggle('comparing', on);
+  compareToggle.classList.toggle('active', on);
+  compareToggle.setAttribute('aria-pressed', on ? 'true' : 'false');
+  compareToggle.textContent = on ? '🧍 Ver ilustração' : '🧍 Ligar comparativo (1,70 m)';
+
+  if(on){
+    requestAnimationFrame(applyComparisonScale);
+    if(currentSpecies && currentSpecies.tamanho){
+      compareCaption.style.display = 'block';
+      compareCaption.textContent = `Comparação aproximada: ${currentSpecies.nome} tem cerca de ${formatMeters(currentSpecies.tamanho)} de comprimento total, ao lado de uma pessoa de 1,70 m.`;
+    }
+  } else {
+    compareCaption.style.display = 'none';
+  }
+}
+
+compareToggle.addEventListener('click', () => setComparing(!comparing));
+window.addEventListener('resize', () => { if(comparing) applyComparisonScale(); });
 
 function openModal(s, illustrationUrl, groupTitle){
   modalGroupTag.innerHTML = groupTitle;
@@ -1589,6 +1747,14 @@ function openModal(s, illustrationUrl, groupTitle){
   modalIllustr.src = illustrationUrl;
   modalIllustr.alt = `Ilustração de ${s.nome} (${s.cientifico})`;
   modalIllustr.onerror = () => { modalIllustr.onerror = null; modalIllustr.src = placeholderSVG(s.nome); };
+
+  currentSpecies = s;
+  compareAnimalImg.src = illustrationUrl;
+  compareAnimalImg.alt = `Ilustração de ${s.nome} em comparação com uma pessoa de 1,70 m`;
+  compareAnimalImg.onerror = () => { compareAnimalImg.onerror = null; compareAnimalImg.src = placeholderSVG(s.nome); };
+  compareAnimalLabel.textContent = s.tamanho ? `${s.nome} · ≈ ${formatMeters(s.tamanho)}` : s.nome;
+  compareToggle.style.display = s.tamanho ? 'inline-flex' : 'none';
+  setComparing(false);
 
   modalOverlay.classList.add('open');
   document.body.style.overflow = 'hidden';
