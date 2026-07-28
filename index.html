@@ -1,13 +1,46 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
+<script>
+/* Evita que o navegador pule direto para uma seção (ex.: #especies)
+   ao carregar/recarregar a página, o que fazia o site "abrir" já
+   dentro do catálogo, sem mostrar a capa. Guardamos o hash original
+   e removemos da URL antes do navegador processar o salto nativo;
+   depois que a página termina de montar tudo, se havia um destino
+   pedido de propósito, rolamos até ele suavemente. */
+(function(){
+  if('scrollRestoration' in history){ history.scrollRestoration = 'manual'; }
+  window.__deepLinkHash = window.location.hash || '';
+  if(window.__deepLinkHash){
+    history.replaceState(null, '', window.location.pathname + window.location.search);
+  }
+})();
+</script>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Mamíferos da Serra Dona Francisca — Cartilha</title>
 <meta name="description" content="Cartilha ilustrada dos mamíferos da Área de Proteção Ambiental Serra Dona Francisca, Joinville (SC).">
+
+<!-- Aparência em navegadores mobile (Android/iOS) -->
+<meta name="theme-color" content="#1e3820">
+<meta name="color-scheme" content="light dark">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Mamíferos DF">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%231e3820'/%3E%3Cpath d='M50 18c18 6 28 20 28 36 0 12-9 22-21 22-4 0-7-2-7-6 0-14 2-28-8-42-4-6 2-12 8-10z' fill='%237ea854'/%3E%3Cpath d='M50 18v58' stroke='%23c79a2e' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%231e3820'/%3E%3Cpath d='M50 18c18 6 28 20 28 36 0 12-9 22-21 22-4 0-7-2-7-6 0-14 2-28-8-42-4-6 2-12 8-10z' fill='%237ea854'/%3E%3Cpath d='M50 18v58' stroke='%23c79a2e' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+
+<!-- Cartão de prévia ao compartilhar (WhatsApp, redes sociais etc.) -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Mamíferos da Serra Dona Francisca — Cartilha">
+<meta property="og:description" content="Guia de campo ilustrado dos mamíferos da APA Dona Francisca, Joinville (SC).">
+<meta property="og:image" content="https://raw.githubusercontent.com/brennobenk1/MamiferosDaSerraDonaFrancisca/main/cover.png">
+<meta name="twitter:card" content="summary_large_image">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,500;1,9..144,600&family=Inter:wght@400;500;600&family=Space+Mono:ital@0;1&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,500;1,9..144,600&family=Inter:wght@400;500;600;700&family=Space+Mono:ital@0;1&display=swap" rel="stylesheet">
 <style>
   :root{
     --forest-deep:#1e3820;
@@ -22,6 +55,20 @@
     --line: rgba(30,56,32,.14);
     --radius: 22px;
     --shadow: 0 18px 40px -20px rgba(20,35,15,.45);
+    --safe-t: env(safe-area-inset-top, 0px);
+    --safe-b: env(safe-area-inset-bottom, 0px);
+    --safe-l: env(safe-area-inset-left, 0px);
+    --safe-r: env(safe-area-inset-right, 0px);
+    color-scheme: light;
+  }
+  html[data-theme="dark"]{
+    --cream:#101a0f;
+    --paper:#0d1610;
+    --ink:#eef1e6;
+    --ink-soft:#b7c2ac;
+    --line: rgba(246,241,228,.12);
+    --shadow: 0 18px 40px -20px rgba(0,0,0,.65);
+    color-scheme: dark;
   }
 
   *{box-sizing:border-box;}
@@ -32,9 +79,12 @@
     color:var(--ink);
     font-family:'Inter',sans-serif;
     -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+    transition:background .3s ease, color .3s ease;
   }
   img{max-width:100%;display:block;}
   a{color:inherit;}
+  button{font-family:inherit;-webkit-tap-highlight-color:transparent;}
 
   h1,h2,h3,.display{
     font-family:'Fraunces',serif;
@@ -54,6 +104,22 @@
     text-transform:uppercase;
     letter-spacing:.12em;
   }
+  .skip-link{
+    position:absolute;
+    left:-999px;
+    top:0;
+    background:var(--gold);
+    color:var(--forest-deep);
+    padding:10px 18px;
+    border-radius:0 0 10px 0;
+    font-weight:700;
+    z-index:200;
+  }
+  .skip-link:focus{left:0;}
+
+  /* ---------- reveal-on-scroll ---------- */
+  .reveal{opacity:0; transform:translateY(18px); transition:opacity .6s ease, transform .6s ease;}
+  .reveal.in-view{opacity:1; transform:none;}
 
   /* ---------- HERO ---------- */
   .hero{
@@ -62,6 +128,7 @@
     color:var(--cream);
     overflow:hidden;
     padding-bottom:120px;
+    padding-top:var(--safe-t);
   }
   .hero::before{
     content:"";
@@ -89,38 +156,90 @@
     opacity:.55;
     clip-path: polygon(0% 0%, 100% 0%, 100% 20%, 88% 30%, 78% 22%, 66% 34%, 55% 24%, 44% 36%, 33% 26%, 22% 38%, 10% 28%, 0% 34%);
   }
+  /* borboletas/vaga-lumes flutuando — só decoração, some com reduced motion */
+  .firefly{
+    position:absolute;
+    width:6px;height:6px;
+    border-radius:50%;
+    background:var(--gold);
+    box-shadow:0 0 12px 3px rgba(199,154,46,.85);
+    opacity:.7;
+    animation:float 7s ease-in-out infinite;
+    pointer-events:none;
+  }
+  @keyframes float{
+    0%,100%{transform:translateY(0) translateX(0);}
+    50%{transform:translateY(-22px) translateX(10px);}
+  }
   .hero-inner{
     position:relative;
     z-index:2;
     max-width:1180px;
     margin:0 auto;
-    padding:64px 32px 0;
+    padding:28px 24px 0;
     text-align:center;
   }
   .brand-row{
-    display:flex;
+    display:grid;
+    grid-template-columns:1fr auto 1fr;
     align-items:center;
-    justify-content:space-between;
-    gap:16px;
+    gap:12px;
     font-family:'Space Mono',monospace;
     font-size:.72rem;
     text-transform:uppercase;
     letter-spacing:.14em;
     color:rgba(246,241,228,.65);
-    margin-bottom:120px;
+    margin-bottom:96px;
   }
   .brand-row .tag{
     border:1px solid rgba(246,241,228,.3);
     border-radius:999px;
     padding:6px 14px;
+    justify-self:start;
   }
+  .brand-row .tag:last-child{
+    justify-self:end;
+  }
+  .catalog-btn{
+    justify-self:center;
+    border:1px solid var(--gold) !important;
+    background:var(--gold);
+    color:var(--forest-deep) !important;
+    font-weight:700;
+    text-decoration:none;
+    cursor:pointer;
+    transition:transform .18s ease, box-shadow .18s ease, background .18s ease;
+    box-shadow:0 8px 20px -8px rgba(199,154,46,.6);
+  }
+  .catalog-btn:hover{
+    background:#e0b23c;
+    transform:translateY(-2px);
+    box-shadow:0 12px 26px -8px rgba(199,154,46,.75);
+  }
+  .theme-toggle{
+    border:1px solid rgba(246,241,228,.3);
+    background:transparent;
+    color:rgba(246,241,228,.85);
+    border-radius:999px;
+    padding:6px 14px;
+    cursor:pointer;
+    font-family:'Space Mono',monospace;
+    font-size:.72rem;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    transition:border-color .18s ease, color .18s ease, background .18s ease;
+  }
+  .theme-toggle:hover{border-color:var(--gold); color:var(--gold);}
   .hero-eyebrow{
     font-size:1.5rem;
     display:block;
     margin-bottom:18px;
   }
   .hero h1{
-    font-size:clamp(2.6rem, 6vw, 5.2rem);
+    font-size:clamp(2.4rem, 8vw, 5.2rem);
     line-height:1.02;
     color:var(--paper);
   }
@@ -173,13 +292,13 @@
   .intro{
     position:relative;
     background:var(--cream);
-    padding:90px 32px 80px;
+    padding:80px 24px 70px;
   }
   .intro::before{
     content:"";
     position:absolute;
     inset:0;
-    background-image:url('assets/leaves.jpg');
+    background-image:url('https://raw.githubusercontent.com/brennobenk1/MamiferosDaSerraDonaFrancisca/main/leaves.jpg');
     background-size:cover;
     background-position:center;
     opacity:.06;
@@ -191,7 +310,7 @@
     margin:0 auto;
     display:grid;
     grid-template-columns: 1.1fr 1fr;
-    gap:64px;
+    gap:56px;
     align-items:start;
   }
   .intro h2{
@@ -213,7 +332,7 @@
     box-shadow:var(--shadow);
   }
   .fact-card .mono{
-    color:var(--forest);
+    color:var(--forest-light);
     font-size:.68rem;
     display:block;
     margin-bottom:14px;
@@ -246,10 +365,36 @@
     display:block;
     color:var(--forest-deep);
   }
+  html[data-theme="dark"] .fact-list .lbl{color:var(--cream);}
   .fact-list .desc{
     color:var(--ink-soft);
     font-size:.92rem;
     line-height:1.5;
+  }
+  /* barra de progresso de ilustrações publicadas */
+  .progress-block{margin-top:22px; padding-top:18px; border-top:1px solid var(--line);}
+  .progress-labels{
+    display:flex;
+    justify-content:space-between;
+    font-size:.72rem;
+    color:var(--ink-soft);
+    margin-bottom:8px;
+    font-family:'Space Mono',monospace;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+  }
+  .progress-track{
+    height:8px;
+    border-radius:999px;
+    background:var(--line);
+    overflow:hidden;
+  }
+  .progress-fill{
+    height:100%;
+    background:linear-gradient(90deg, var(--forest-light), var(--gold));
+    border-radius:999px;
+    transition:width 1.1s cubic-bezier(.16,1,.3,1);
+    width:0%;
   }
 
   /* ---------- FILTER NAV ---------- */
@@ -260,24 +405,72 @@
     background:rgba(246,241,228,.92);
     backdrop-filter:blur(10px);
     border-bottom:1px solid var(--line);
-    padding:16px 32px;
+    padding:14px calc(24px + var(--safe-r)) 14px calc(24px + var(--safe-l));
   }
+  html[data-theme="dark"] .filter-bar{background:rgba(13,22,16,.88);}
   .filter-inner{
     max-width:1180px;
     margin:0 auto;
     display:flex;
+    flex-direction:column;
+    gap:12px;
+  }
+  .search-row{
+    display:flex;
     gap:10px;
-    flex-wrap:wrap;
     align-items:center;
   }
-  .filter-inner .lbl{
+  .search-box{
+    position:relative;
+    flex:1;
+    max-width:340px;
+  }
+  .search-box input{
+    width:100%;
+    font-family:'Inter',sans-serif;
+    font-size:.9rem;
+    padding:10px 14px 10px 34px;
+    border-radius:999px;
+    border:1px solid var(--line);
+    background:var(--paper);
+    color:var(--ink);
+    outline:none;
+    transition:border-color .18s ease;
+  }
+  .search-box input:focus{border-color:var(--forest-light);}
+  .search-box svg{
+    position:absolute;
+    left:12px; top:50%;
+    transform:translateY(-50%);
+    opacity:.5;
+    pointer-events:none;
+  }
+  .random-btn{
     font-family:'Space Mono',monospace;
     font-size:.68rem;
     text-transform:uppercase;
-    letter-spacing:.12em;
-    color:var(--ink-soft);
-    margin-right:6px;
+    letter-spacing:.08em;
+    white-space:nowrap;
+    border:1px solid var(--forest);
+    background:transparent;
+    color:var(--forest);
+    padding:10px 14px;
+    border-radius:999px;
+    cursor:pointer;
+    transition:.18s ease;
   }
+  html[data-theme="dark"] .random-btn{color:var(--forest-light); border-color:var(--forest-light);}
+  .random-btn:hover{background:var(--forest); color:var(--cream);}
+  .chip-row{
+    display:flex;
+    gap:8px;
+    flex-wrap:nowrap;
+    overflow-x:auto;
+    scrollbar-width:none;
+    -webkit-overflow-scrolling:touch;
+    padding-bottom:2px;
+  }
+  .chip-row::-webkit-scrollbar{display:none;}
   .chip{
     font-family:'Inter',sans-serif;
     font-size:.83rem;
@@ -285,11 +478,12 @@
     background:transparent;
     border:1px solid var(--line);
     color:var(--ink-soft);
-    padding:8px 16px;
+    padding:9px 16px;
     border-radius:999px;
     cursor:pointer;
     transition:.18s ease;
     white-space:nowrap;
+    flex:none;
   }
   .chip:hover{border-color:var(--forest-light); color:var(--forest-deep);}
   .chip.active{
@@ -297,31 +491,43 @@
     border-color:var(--forest-deep);
     color:var(--paper);
   }
+  .no-results{
+    max-width:1180px;
+    margin:0 auto;
+    padding:60px 24px;
+    text-align:center;
+    color:var(--ink-soft);
+    display:none;
+  }
+  .no-results.show{display:block;}
+  .no-results .display{font-size:1.4rem; color:var(--forest-deep); margin-bottom:8px;}
 
   /* ---------- SPECIES SECTIONS ---------- */
   .species-wrap{
     max-width:1180px;
     margin:0 auto;
-    padding:70px 32px 40px;
+    padding:64px 24px 40px;
   }
   .group{
-    margin-bottom:64px;
+    margin-bottom:60px;
   }
   .group-head{
     display:flex;
     align-items:baseline;
     gap:16px;
-    margin-bottom:28px;
+    margin-bottom:26px;
+    flex-wrap:wrap;
   }
   .group-head h2{
-    font-size:1.7rem;
+    font-size:1.6rem;
     color:var(--forest-deep);
   }
+  html[data-theme="dark"] .group-head h2{color:var(--cream);}
   .group-head .count{
     font-family:'Space Mono',monospace;
     font-size:.72rem;
-    color:var(--forest);
-    background:rgba(61,107,44,.1);
+    color:var(--forest-light);
+    background:rgba(126,168,84,.12);
     padding:4px 10px;
     border-radius:999px;
   }
@@ -329,20 +535,20 @@
     flex:1;
     height:1px;
     background:var(--line);
+    min-width:24px;
   }
   .group-note{
     font-size:.88rem;
     color:var(--ink-soft);
-    margin:-14px 0 26px;
+    margin:-12px 0 24px;
     max-width:640px;
     line-height:1.6;
   }
   .grid{
     display:grid;
-    grid-template-columns:repeat(auto-fill, minmax(260px, 1fr));
-    gap:26px;
+    grid-template-columns:repeat(auto-fill, minmax(240px, 1fr));
+    gap:22px;
   }
-
   .card{
     background:var(--paper);
     border:1px solid var(--line);
@@ -352,11 +558,13 @@
     transition:transform .22s ease, box-shadow .22s ease;
     display:flex;
     flex-direction:column;
+    cursor:pointer;
   }
   .card:hover{
     transform:translateY(-5px);
     box-shadow:var(--shadow);
   }
+  .card:focus-visible{outline:2px solid var(--forest-light); outline-offset:3px;}
   .card-media{
     position:relative;
     aspect-ratio:4/3.2;
@@ -370,7 +578,9 @@
     height:100%;
     object-fit:cover;
     object-position:center 20%;
+    transition:transform .4s ease;
   }
+  .card:hover .card-media img{transform:scale(1.05);}
   .card-tag{
     position:absolute;
     top:12px;
@@ -386,29 +596,30 @@
     backdrop-filter:blur(3px);
   }
   .card-body{
-    padding:20px 22px 22px;
+    padding:18px 20px 20px;
     display:flex;
     flex-direction:column;
-    gap:8px;
+    gap:6px;
     flex:1;
   }
   .card-body h3{
-    font-size:1.18rem;
+    font-size:1.12rem;
     color:var(--forest-deep);
   }
+  html[data-theme="dark"] .card-body h3{color:var(--gold);}
   .sci{
     font-family:'Fraunces',serif;
     font-style:italic;
     color:var(--bark);
-    font-size:.9rem;
+    font-size:.88rem;
   }
+  html[data-theme="dark"] .sci{color:var(--forest-light);}
   .card-body p{
-    margin:6px 0 0;
-    font-size:.86rem;
+    margin:4px 0 0;
+    font-size:.85rem;
     line-height:1.6;
     color:var(--ink-soft);
   }
-
   .placeholder-note{
     margin-top:auto;
     padding-top:10px;
@@ -419,11 +630,35 @@
     color:var(--forest-light);
   }
 
+  /* botão flutuante: voltar ao topo */
+  .to-top{
+    position:fixed;
+    right:calc(20px + var(--safe-r));
+    bottom:calc(20px + var(--safe-b));
+    width:48px; height:48px;
+    border-radius:50%;
+    border:none;
+    background:var(--forest-deep);
+    color:var(--cream);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    box-shadow:0 12px 26px -8px rgba(20,35,15,.6);
+    cursor:pointer;
+    z-index:40;
+    opacity:0;
+    transform:translateY(12px);
+    pointer-events:none;
+    transition:opacity .25s ease, transform .25s ease, background .2s ease;
+  }
+  .to-top.show{opacity:1; transform:none; pointer-events:auto;}
+  .to-top:hover{background:var(--forest);}
+
   /* ---------- FOOTER ---------- */
   footer{
     background:var(--forest-deep);
     color:var(--cream);
-    padding:80px 32px 40px;
+    padding:70px 24px calc(36px + var(--safe-b));
     position:relative;
     overflow:hidden;
   }
@@ -444,11 +679,11 @@
     display:grid;
     grid-template-columns:1.2fr 1fr;
     gap:50px;
-    padding-bottom:44px;
+    padding-bottom:40px;
     border-bottom:1px solid rgba(246,241,228,.15);
   }
   footer h2{
-    font-size:1.8rem;
+    font-size:1.7rem;
     color:var(--paper);
     margin-bottom:14px;
   }
@@ -487,42 +722,402 @@
   .credits a:hover{color:var(--gold);}
   .footer-bottom{
     display:flex;
-    justify-content:space-between;
+    justify-content:center;
     align-items:center;
     flex-wrap:wrap;
     gap:12px;
-    padding-top:26px;
+    padding-top:24px;
     font-family:'Space Mono',monospace;
     font-size:.68rem;
     letter-spacing:.06em;
     text-transform:uppercase;
     color:rgba(246,241,228,.5);
+    text-align:center;
   }
-  .footer-bottom a{text-decoration:underline; text-underline-offset:3px;}
 
   @media (max-width:760px){
     .intro-inner{grid-template-columns:1fr;}
     .footer-top{grid-template-columns:1fr;}
-    .brand-row{margin-bottom:70px; flex-wrap:wrap;}
-    .hero-inner{padding-top:40px;}
+    .brand-row{margin-bottom:64px; grid-template-columns:1fr; justify-items:center; text-align:center;}
+    .brand-row .tag, .brand-row .tag:last-child{justify-self:center;}
+    .hero-inner{padding-top:20px;}
+    .search-row{flex-wrap:wrap;}
+    .search-box{max-width:none; flex:1 1 100%;}
+    .random-btn{flex:1;}
   }
-
+  @media (max-width:480px){
+    .hero{padding-bottom:90px;}
+    .hero-sub{font-size:.98rem;}
+    .authors{font-size:.95rem;}
+    .grid{grid-template-columns:repeat(auto-fill, minmax(150px, 1fr)); gap:14px;}
+    .card-body{padding:14px 16px 16px;}
+    .card-body h3{font-size:1rem;}
+    .group-head h2{font-size:1.32rem;}
+    .intro{padding:60px 20px 50px;}
+    .fact-card{padding:22px;}
+    .species-wrap{padding:48px 18px 24px;}
+    .filter-bar{padding:12px calc(18px + var(--safe-r)) 12px calc(18px + var(--safe-l));}
+  }
   @media (prefers-reduced-motion: reduce){
     html{scroll-behavior:auto;}
     .card{transition:none;}
+    .reveal{opacity:1; transform:none; transition:none;}
+    .firefly{animation:none; display:none;}
+  }
+
+  /* ---------- MODAL ---------- */
+  .modal-overlay{
+    position:fixed;
+    inset:0;
+    z-index:100;
+    display:none;
+    align-items:flex-start;
+    justify-content:center;
+    padding:4vh 20px calc(4vh + var(--safe-b));
+    overflow-y:auto;
+    background:rgba(15,24,13,.72);
+    backdrop-filter:blur(4px);
+    -webkit-overflow-scrolling:touch;
+  }
+  .modal-overlay.open{display:flex;}
+  .modal-card{
+    position:relative;
+    width:min(1080px, 100%);
+    background:var(--paper);
+    border-radius:26px;
+    box-shadow:0 40px 80px -30px rgba(0,0,0,.6);
+    overflow:hidden;
+    animation:modalIn .25s ease;
+  }
+  @keyframes modalIn{
+    from{opacity:0; transform:translateY(14px) scale(.985);}
+    to{opacity:1; transform:none;}
+  }
+  .modal-close{
+    position:absolute;
+    top:14px; right:14px;
+    z-index:5;
+    width:42px; height:42px;
+    border-radius:50%;
+    border:none;
+    background:rgba(31,38,27,.6);
+    color:var(--cream);
+    font-size:1.5rem;
+    line-height:1;
+    cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    backdrop-filter:blur(3px);
+  }
+  .modal-close:hover{background:var(--forest-deep);}
+  .modal-grid{
+    display:grid;
+    grid-template-columns: 260px 1fr;
+  }
+  .modal-map{
+    position:relative;
+    background:var(--forest-deep);
+    padding:26px 22px;
+    display:flex;
+    flex-direction:column;
+    color:var(--cream);
+    overflow:hidden;
+  }
+  .modal-map::before,
+  .modal-map::after{
+    content:"";
+    position:absolute;
+    left:0;
+    width:140%;
+    pointer-events:none;
+  }
+  .modal-map::before{
+    top:-10%;
+    height:46%;
+    background:var(--forest);
+    opacity:.5;
+    clip-path: polygon(0% 0%, 100% 0%, 100% 38%, 92% 45%, 84% 40%, 74% 52%, 63% 44%, 52% 58%, 41% 48%, 30% 60%, 20% 50%, 9% 62%, 0% 52%);
+  }
+  .modal-map::after{
+    bottom:-14%;
+    height:40%;
+    background:var(--forest-deep);
+    opacity:.65;
+    transform:scaleY(-1);
+    clip-path: polygon(0% 0%, 100% 0%, 100% 20%, 88% 30%, 78% 22%, 66% 34%, 55% 24%, 44% 36%, 33% 26%, 22% 38%, 10% 28%, 0% 34%);
+  }
+  .modal-map > *{
+    position:relative;
+    z-index:2;
+  }
+  .map-head{margin-bottom:14px;}
+  .map-head .mono{font-size:.65rem; color:var(--forest-light);}
+  .map-wrap{
+    position:relative;
+    background:rgba(0,0,0,.15);
+    border-radius:14px;
+    overflow:hidden;
+    min-height:220px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .map-wrap svg{display:block;}
+  .map-loading{
+    font-family:'Space Mono',monospace;
+    font-size:.68rem;
+    color:rgba(246,241,228,.6);
+    text-align:center;
+    padding:20px;
+  }
+  .map-empty-note{
+    position:absolute;
+    bottom:8px; left:8px; right:8px;
+    font-size:.62rem;
+    line-height:1.4;
+    color:rgba(246,241,228,.75);
+    background:rgba(0,0,0,.35);
+    padding:6px 8px;
+    border-radius:8px;
+    margin:0;
+  }
+  .map-caption{
+    font-size:.72rem;
+    line-height:1.55;
+    color:rgba(246,241,228,.62);
+    margin:14px 0 0;
+  }
+  .modal-main{
+    padding:26px 26px 30px;
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+    min-width:0;
+  }
+  .modal-illustration{
+    position:relative;
+    background:var(--forest-deep);
+    border-radius:18px;
+    overflow:hidden;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    min-height:240px;
+  }
+  .modal-illustration::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:
+      radial-gradient(900px 400px at 15% -20%, rgba(126,168,84,.32), transparent 60%),
+      radial-gradient(700px 400px at 100% 110%, rgba(199,154,46,.16), transparent 55%);
+    pointer-events:none;
+  }
+  .modal-illustration::after{
+    content:"";
+    position:absolute;
+    left:-10%;
+    bottom:-8%;
+    width:120%;
+    height:34%;
+    background:var(--forest);
+    opacity:.35;
+    clip-path: polygon(0% 100%, 100% 100%, 100% 62%, 92% 55%, 84% 60%, 74% 48%, 63% 56%, 52% 42%, 41% 52%, 30% 40%, 20% 50%, 9% 38%, 0% 48%);
+    pointer-events:none;
+  }
+  .modal-illustration img#modalIllustration{
+    position:relative;
+    z-index:2;
+    width:100%;
+    max-height:50vh;
+    object-fit:contain;
+    padding:14px;
+  }
+  .modal-illustration .modal-photo-badge{z-index:3;}
+  .modal-photo-badge{
+    position:absolute;
+    top:14px; right:14px;
+    width:96px;
+    background:rgba(251,248,241,.95);
+    border-radius:12px;
+    padding:6px;
+    box-shadow:0 10px 24px -10px rgba(0,0,0,.5);
+    text-align:center;
+  }
+  .modal-photo-badge img#modalRealPhoto{
+    width:100%;
+    aspect-ratio:1/1;
+    object-fit:cover;
+    border-radius:8px;
+    background:var(--line);
+  }
+  .modal-photo-badge.loading img#modalRealPhoto{opacity:.3;}
+  .modal-photo-badge.empty img#modalRealPhoto{display:none;}
+  .modal-photo-credit{
+    display:block;
+    font-family:'Space Mono',monospace;
+    font-size:.5rem;
+    line-height:1.35;
+    color:var(--ink-soft);
+    margin-top:5px;
+    word-break:break-word;
+  }
+  .modal-photo-badge::before{
+    content:"Foto real";
+    display:block;
+    font-family:'Space Mono',monospace;
+    font-size:.48rem;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    color:var(--forest);
+    margin-bottom:3px;
+  }
+
+  .modal-info h2{
+    font-size:1.7rem;
+    color:var(--forest-deep);
+    margin-bottom:2px;
+  }
+  html[data-theme="dark"] .modal-info h2{color:var(--gold);}
+  .modal-info .sci{font-size:1.02rem;}
+  .modal-info p{
+    margin-top:12px;
+    color:var(--ink-soft);
+    line-height:1.7;
+    font-size:.95rem;
+  }
+  .modal-info .card-tag{
+    position:static;
+    display:inline-block;
+    background:rgba(61,107,44,.15);
+    color:var(--forest-light);
+    margin-bottom:10px;
+  }
+
+  /* ---------- Comparativo de tamanho (homem de 1,70m) ---------- */
+  .compare-toggle{
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    border:1px solid rgba(61,107,44,.35);
+    background:rgba(61,107,44,.08);
+    color:var(--forest);
+    border-radius:999px;
+    padding:7px 14px;
+    cursor:pointer;
+    font-family:'Space Mono',monospace;
+    font-size:.68rem;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    margin:2px 0 4px;
+    transition:border-color .18s ease, background .18s ease, color .18s ease, transform .12s ease;
+  }
+  .compare-toggle:hover{border-color:var(--gold); color:var(--bark); background:rgba(199,154,46,.14); transform:translateY(-1px);}
+  .compare-toggle.active{background:var(--forest); color:var(--cream); border-color:var(--forest);}
+  html[data-theme="dark"] .compare-toggle{color:var(--forest-light); border-color:rgba(126,168,84,.4); background:rgba(126,168,84,.1);}
+  html[data-theme="dark"] .compare-toggle.active{background:var(--forest-light); color:var(--forest-deep); border-color:var(--forest-light);}
+
+  .modal-illustration.comparing img#modalIllustration{display:none;}
+  .compare-stage{
+    display:none;
+    position:relative;
+    z-index:2;
+    width:100%;
+    height:100%;
+    align-items:flex-end;
+    justify-content:center;
+    gap:clamp(18px, 6vw, 46px);
+    padding:20px 14px 34px;
+  }
+  .modal-illustration.comparing .compare-stage{display:flex;}
+  .compare-figure{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:8px;
+    animation:compareIn .45s cubic-bezier(.2,.8,.25,1) both;
+  }
+  .compare-figure.animal{animation-delay:.08s;}
+  @keyframes compareIn{
+    from{opacity:0; transform:translateY(14px) scale(.85);}
+    to{opacity:1; transform:none;}
+  }
+  .compare-figure svg{display:block; color:var(--ink-soft);}
+  html[data-theme="dark"] .compare-figure svg{color:rgba(246,241,228,.82);}
+  .compare-figure img{
+    display:block;
+    object-fit:contain;
+    max-width:44vw;
+    filter:drop-shadow(0 6px 10px rgba(0,0,0,.25));
+    transition:height .35s cubic-bezier(.2,.8,.25,1), width .35s cubic-bezier(.2,.8,.25,1);
+  }
+  .compare-label{
+    font-family:'Space Mono',monospace;
+    font-size:.68rem;
+    letter-spacing:.04em;
+    color:var(--ink-soft);
+    background:rgba(251,248,241,.9);
+    padding:3px 9px;
+    border-radius:999px;
+    white-space:nowrap;
+  }
+  html[data-theme="dark"] .compare-label{background:rgba(30,56,32,.75); color:var(--cream);}
+  .compare-ground{
+    display:none;
+    position:absolute;
+    left:6%;
+    right:6%;
+    bottom:26px;
+    height:2px;
+    background:linear-gradient(90deg, transparent, var(--gold), transparent);
+    opacity:.55;
+    z-index:1;
+  }
+  .modal-illustration.comparing .compare-ground{display:block;}
+  .compare-caption{
+    font-size:.72rem;
+    color:var(--ink-soft);
+    margin-top:8px;
+    opacity:.85;
+  }
+
+  @media (max-width:720px){
+    .modal-overlay{padding:0; align-items:flex-end;}
+    .modal-card{
+      width:100%;
+      max-height:92vh;
+      border-radius:22px 22px 0 0;
+      overflow-y:auto;
+      animation:sheetIn .3s ease;
+    }
+    @keyframes sheetIn{
+      from{transform:translateY(30px); opacity:0;}
+      to{transform:none; opacity:1;}
+    }
+    .modal-grid{grid-template-columns:1fr;}
+    .modal-map{order:2; padding:22px 18px calc(22px + var(--safe-b));}
+    .modal-main{order:1; padding:22px 18px 18px;}
+    .modal-illustration{min-height:200px;}
+    .modal-illustration img#modalIllustration{max-height:38vh;}
   }
 </style>
 </head>
 <body>
+<a href="#especies" class="skip-link">Pular para o catálogo</a>
 
 <!-- ============ HERO ============ -->
 <header class="hero">
   <div class="canopy two"></div>
   <div class="canopy"></div>
+  <div class="firefly" style="top:18%; left:12%; animation-delay:0s;"></div>
+  <div class="firefly" style="top:30%; left:82%; animation-delay:1.4s;"></div>
+  <div class="firefly" style="top:12%; left:55%; animation-delay:2.6s;"></div>
   <div class="hero-inner">
     <div class="brand-row">
       <span class="tag">APA Dona Francisca · Joinville, SC</span>
-      <span class="tag">Educação ambiental &amp; ilustração científica</span>
+      <a href="#especies" class="tag catalog-btn">Catálogo</a>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false">
+        <span id="themeIcon">🌙</span> <span id="themeLabel">Modo noturno</span>
+      </button>
     </div>
     <span class="eyebrow hero-eyebrow">Cartilha</span>
     <h1>Mamíferos da<br><em>Serra Dona Francisca</em></h1>
@@ -534,20 +1129,20 @@
     </p>
   </div>
   <div class="hero-strip">
-    <img src="assets/banner.jpeg" alt="Ilustrações de mamíferos da Serra Dona Francisca lado a lado: anta, veado, puma, quati, tamanduá, macaco-prego e outros.">
+    <img src="https://raw.githubusercontent.com/brennobenk1/MamiferosDaSerraDonaFrancisca/main/banner.jpeg" alt="Ilustrações de mamíferos da Serra Dona Francisca lado a lado: anta, veado, puma, quati, tamanduá, macaco-prego e outros.">
   </div>
 </header>
 
 <!-- ============ INTRO ============ -->
 <section class="intro" id="sobre">
   <div class="intro-inner">
-    <div>
+    <div class="reveal">
       <span class="eyebrow" style="font-size:1rem;">Sobre a Serra</span>
       <h2>Uma floresta que sustenta água, solo e clima — e uma comunidade inteira de mamíferos.</h2>
       <p>A Serra Dona Francisca é um lugar muito especial em Joinville (SC). Nela está a Área de Proteção Ambiental (APA) Dona Francisca, criada para garantir que a natureza seja conservada e, ao mesmo tempo, utilizada de forma responsável pelas pessoas. Esse espaço abriga florestas, rios e muitas espécies de animais, sendo essencial para manter o clima equilibrado, proteger os mananciais de água e conservar o solo.</p>
       <p>Entre os habitantes mais importantes dessa região estão os mamíferos: animais que espalham sementes, controlam populações de outras espécies e mantêm o equilíbrio da mata. Esta cartilha nasceu para aproximar essa ciência da comunidade — em linguagem simples, lúdica e ilustrada — e despertar o interesse das crianças pela fauna do seu próprio território.</p>
     </div>
-    <div class="fact-card">
+    <div class="fact-card reveal">
       <span class="mono">Sobre este catálogo</span>
       <ul class="fact-list">
         <li>
@@ -572,6 +1167,13 @@
           </div>
         </li>
       </ul>
+      <div class="progress-block">
+        <div class="progress-labels">
+          <span id="progressLabel">Ilustrações publicadas</span>
+          <span id="progressCount">0/0</span>
+        </div>
+        <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+      </div>
     </div>
   </div>
 </section>
@@ -579,32 +1181,99 @@
 <!-- ============ FILTER ============ -->
 <nav class="filter-bar" id="filtros">
   <div class="filter-inner">
-    <span class="lbl">Filtrar por grupo</span>
-    <button class="chip active" data-filter="all">Todos (<span id="count-all"></span>)</button>
-    <button class="chip" data-filter="felinos">Felinos</button>
-    <button class="chip" data-filter="canideos">Canídeos</button>
-    <button class="chip" data-filter="primatas">Primatas</button>
-    <button class="chip" data-filter="marsupiais">Marsupiais</button>
-    <button class="chip" data-filter="mustelideos">Mustelídeos &amp; procionídeos</button>
-    <button class="chip" data-filter="roedores">Roedores</button>
-    <button class="chip" data-filter="ungulados">Ungulados</button>
-    <button class="chip" data-filter="xenartros">Tatus &amp; tamanduás</button>
-    <button class="chip" data-filter="morcegos">Morcegos</button>
-    <button class="chip" data-filter="outros">Outros</button>
+    <div class="search-row">
+      <div class="search-box">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <input type="search" id="searchInput" placeholder="Buscar por nome popular ou científico…" aria-label="Buscar espécie">
+      </div>
+      <button class="random-btn" id="randomBtn" type="button">🎲 Espécie aleatória</button>
+    </div>
+    <div class="chip-row" id="chipRow">
+      <button class="chip active" data-filter="all">Todos (<span id="count-all"></span>)</button>
+      <button class="chip" data-filter="felinos">Felinos</button>
+      <button class="chip" data-filter="canideos">Canídeos</button>
+      <button class="chip" data-filter="primatas">Primatas</button>
+      <button class="chip" data-filter="marsupiais">Marsupiais</button>
+      <button class="chip" data-filter="mustelideos">Mustelídeos &amp; procionídeos</button>
+      <button class="chip" data-filter="roedores">Roedores</button>
+      <button class="chip" data-filter="ungulados">Ungulados</button>
+      <button class="chip" data-filter="xenartros">Tatus &amp; tamanduás</button>
+      <button class="chip" data-filter="morcegos">Morcegos</button>
+      <button class="chip" data-filter="outros">Outros</button>
+    </div>
   </div>
 </nav>
 
 <!-- ============ SPECIES ============ -->
 <main class="species-wrap" id="especies"></main>
+<p class="no-results" id="noResults">
+  <span class="display">Nenhuma espécie encontrada 🍃</span>
+  Tente outro termo de busca ou volte para "Todos".
+</p>
+
+<!-- ============ MODAL: FICHA DA ESPÉCIE ============ -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalName">
+    <button class="modal-close" id="modalClose" aria-label="Fechar ficha">&times;</button>
+    <div class="modal-grid">
+      <div class="modal-map">
+        <div class="map-head">
+          <span class="mono">Ocorrência no Brasil</span>
+        </div>
+        <div class="map-wrap" id="modalMap">
+          <span class="map-loading">Carregando mapa…</span>
+        </div>
+        <p class="map-caption">Pontos com base em registros públicos da espécie no <a href="https://www.gbif.org" target="_blank" rel="noopener" style="color:inherit;">GBIF.org</a>. Mostra onde a espécie já foi observada, não uma área contínua de distribuição.</p>
+      </div>
+      <div class="modal-main">
+        <div class="modal-illustration" id="modalIllustrationWrap">
+          <img id="modalIllustration" src="" alt="">
+          <div class="modal-photo-badge loading" id="modalPhotoBadge">
+            <img id="modalRealPhoto" src="" alt="Foto real da espécie via iNaturalist">
+            <span class="modal-photo-credit" id="modalPhotoCredit">Buscando foto…</span>
+          </div>
+          <div class="compare-ground"></div>
+          <div class="compare-stage" id="compareStage">
+            <div class="compare-figure human">
+              <svg id="compareHumanSvg" viewBox="0 0 100 320" width="70">
+                <circle cx="50" cy="34" r="30" fill="currentColor"/>
+                <rect x="20" y="68" width="60" height="112" rx="26" fill="currentColor"/>
+                <rect x="4"  y="78" width="18" height="92" rx="9" fill="currentColor"/>
+                <rect x="78" y="78" width="18" height="92" rx="9" fill="currentColor"/>
+                <rect x="26" y="176" width="20" height="142" rx="10" fill="currentColor"/>
+                <rect x="54" y="176" width="20" height="142" rx="10" fill="currentColor"/>
+              </svg>
+              <span class="compare-label">Pessoa · 1,70 m</span>
+            </div>
+            <div class="compare-figure animal">
+              <img id="compareAnimalImg" src="" alt="">
+              <span class="compare-label" id="compareAnimalLabel"></span>
+            </div>
+          </div>
+        </div>
+        <div class="modal-info">
+          <span class="card-tag" id="modalGroupTag"></span>
+          <h2 id="modalName"></h2>
+          <span class="sci" id="modalSci"></span>
+          <button class="compare-toggle" id="compareToggle" type="button" aria-pressed="false">
+            🧍 Ligar comparativo (1,70 m)
+          </button>
+          <p id="modalDesc"></p>
+          <p class="compare-caption" id="compareCaption" style="display:none;"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- ============ FOOTER ============ -->
 <footer id="equipe">
   <div class="footer-inner">
-    <div class="footer-top">
+    <div class="footer-top reveal">
       <div>
         <h2>Uma cartilha feita por muitas mãos.</h2>
         <p>Este projeto une pesquisa de campo, ilustração científica e educação ambiental para aproximar a comunidade de Joinville da biodiversidade que existe no seu próprio quintal — a Serra Dona Francisca.</p>
-        <p>Todas as ilustrações são originais, produzidas digitalmente e hospedadas no <a href="https://github.com/brennobenk1/MamiferosDaSerraDonaFrancisca" target="_blank" rel="noopener">repositório do projeto no GitHub</a>.</p>
+        <p>Todas as ilustrações são originais e produzidas digitalmente especialmente para esta cartilha.</p>
       </div>
       <div class="credits">
         <dl>
@@ -618,30 +1287,46 @@
           <dd>Brenno Alef Benk</dd>
 
           <dt>Textos</dt>
-          <dd>Dra. <a href="https://www.escavador.com/sobre/3081577/denise-monique-dubet-da-silva-mouga" target="_blank" rel="noopener">Denise Monique Dubet da Silva Mouga</a>, Lucas Henrique Ineichen Damiani, Salem Brian Seger e Vitor Augusto Iwaya Goulart</dd>
+          <dd>Dra. <a href="https://www.escavador.com/sobre/3081577/denise-monique-dubet-da-silva-mouga" target="_blank" rel="noopener">Denise Monique Dubet da Silva Mouga</a>, Lucas Henrique Ineichen Damiani, Salem Selene Seger e Vitor Augusto Iwaya Goulart</dd>
         </dl>
       </div>
     </div>
     <div class="footer-bottom">
-      <span>Cartilha Mamíferos da Serra Dona Francisca — APA Dona Francisca, Joinville/SC</span>
-      <a href="https://github.com/brennobenk1/MamiferosDaSerraDonaFrancisca" target="_blank" rel="noopener">github.com/brennobenk1/MamiferosDaSerraDonaFrancisca</a>
+      <span>Cartilha Mamíferos da Serra Dona Francisca — APA Dona Francisca, Joinville/SC · Feito com 💚 para a educação ambiental</span>
     </div>
   </div>
 </footer>
 
+<button class="to-top" id="toTop" type="button" aria-label="Voltar ao topo">↑</button>
+
+<script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
 <script>
 /* ===========================================================
    DADOS DAS ESPÉCIES
    -----------------------------------------------------------
-   Para publicar uma ilustração, adicione no repositório do
-   GitHub um arquivo em:  /ilustracoes/<slug>.png
-   onde <slug> é o nome científico em minúsculas, com hífen
-   no lugar do espaço (ex: Tapirus terrestris -> tapirus-terrestris.png)
-   Enquanto o arquivo não existir, o card mostra um selo
+   As ilustrações NÃO são mais amarradas manualmente por um
+   campo "arquivo". Em vez disso, ao carregar a página, o site
+   lista automaticamente os arquivos da pasta /Ilustracoes no
+   GitHub e casa cada espécie com um arquivo cujo nome (sem a
+   extensão, ignorando acentos/maiúsculas/hífens) seja IDÊNTICO
+   ao nome científico OU ao nome popular da espécie.
+
+   Ou seja: para publicar uma ilustração, basta subir o arquivo
+   na pasta Ilustracoes com o nome exatamente igual a um dos
+   dois — por exemplo, para a Anta-brasileira (Tapirus terrestris):
+     "Tapirus terrestris.png"   ou   "Anta-brasileira.png"
+   Nada precisa ser editado aqui no código. Enquanto não houver
+   um arquivo com nome correspondente, o card mostra um selo
    "ilustração em produção" no lugar da imagem.
    =========================================================== */
 
-const GITHUB_RAW_BASE = "https://raw.githubusercontent.com/brennobenk1/MamiferosDaSerraDonaFrancisca/main/Ilustracoes/";
+const GITHUB_OWNER = "brennobenk1";
+const GITHUB_REPO  = "MamiferosDaSerraDonaFrancisca";
+const GITHUB_BRANCH = "main";
+const ILLUSTRATIONS_DIR = "Ilustracoes";
+const GITHUB_RAW_BASE = `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/${GITHUB_BRANCH}/${ILLUSTRATIONS_DIR}/`;
+const GITHUB_CONTENTS_API = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${ILLUSTRATIONS_DIR}?ref=${GITHUB_BRANCH}`;
 
 const LOREM = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua, habitando na mata da Serra Dona Francisca.";
 
@@ -659,50 +1344,176 @@ const GROUPS = {
 };
 
 const SPECIES = [
-  { nome:"Anta-brasileira", cientifico:"Tapirus terrestris", grupo:"ungulados", arquivo:"anta.png" },
-  { nome:"Cuíca-graciosa", cientifico:"Gracilinanus agilis", grupo:"marsupiais" },
-  { nome:"Caxinguelê", cientifico:"Sciurus aestuans", grupo:"roedores", arquivo:"Caxinguele.png" },
-  { nome:"Cachorro-vinagre", cientifico:"Speothos venaticus", grupo:"canideos", arquivo:"Cachorro vinagre.png" },
-  { nome:"Gambá-orelha-branca", cientifico:"Didelphis albiventris", grupo:"marsupiais", arquivo:"gamba de orelha branca.png" },
-  { nome:"Graxaim", cientifico:"Cerdocyon thous", grupo:"canideos", arquivo:"cachorro do mato.png" },
-  { nome:"Irara", cientifico:"Eira barbara", grupo:"mustelideos", arquivo:"irara.png" },
-  { nome:"Jaguatirica", cientifico:"Leopardus pardalis", grupo:"felinos", arquivo:"jaguatirica.png" },
-  { nome:"Macaco-prego", cientifico:"Sapajus nigritus", grupo:"primatas", arquivo:"macaco prego.png" },
-  { nome:"Mão-pelada", cientifico:"Procyon cancrivorus", grupo:"mustelideos", arquivo:"mao pelada.png" },
-  { nome:"Morcego-pescador", cientifico:"Noctilio leporinus", grupo:"morcegos", arquivo:"Noctilio leporinus morçego pescador.png" },
-  { nome:"Morcego-bombachudo", cientifico:"Chrotopterus auritus", grupo:"morcegos", arquivo:"Chrotopterus auritus.png" },
-  { nome:"Onça-parda", cientifico:"Puma concolor", grupo:"felinos", arquivo:"puma.png" },
-  { nome:"Ouriço-preto", cientifico:"Chaetomys subspinosus", grupo:"roedores", arquivo:"ouriço caxeiro.png" },
-  { nome:"Quati", cientifico:"Nasua nasua", grupo:"mustelideos", arquivo:"nasua nasua quati.png" },
-  { nome:"Tamanduá-mirim", cientifico:"Tamandua tetradactyla", grupo:"xenartros", arquivo:"tamandua mirim.png" },
-  { nome:"Veado-catingueiro", cientifico:"Mazama sp.", grupo:"ungulados", arquivo:"mazama veado mateiro.png" },
-  { nome:"Gato-do-mato-do-sul", cientifico:"Leopardus guttulus", grupo:"felinos", arquivo:"gato do mato do sul sem fundo.png" },
-  { nome:"Lobo-guará", cientifico:"Chrysocyon brachyurus", grupo:"canideos" },
-  { nome:"Gato-maracajá", cientifico:"Leopardus wiedii", grupo:"felinos" },
-  { nome:"Lontra", cientifico:"Lontra longicaudis", grupo:"mustelideos" },
-  { nome:"Ratão-do-banhado", cientifico:"Myocastor coypus", grupo:"roedores" },
-  { nome:"Gambá-orelha-preta", cientifico:"Didelphis aurita", grupo:"marsupiais" },
-  { nome:"Bugio-ruivo", cientifico:"Alouatta clamitans", grupo:"primatas" },
-  { nome:"Capivara", cientifico:"Hydrochoerus hydrochaeris", grupo:"roedores" },
-  { nome:"Cateto", cientifico:"Pecari tajacu", grupo:"ungulados" },
-  { nome:"Cutia", cientifico:"Dasyprocta azarae", grupo:"roedores" },
-  { nome:"Furão-pequeno", cientifico:"Galictis cuja", grupo:"mustelideos" },
-  { nome:"Gato-do-mato", cientifico:"Leopardus tigrinus", grupo:"felinos" },
-  { nome:"Gato-mourisco", cientifico:"Herpailurus yagouaroundi", grupo:"felinos" },
-  { nome:"Gavião-carijó", cientifico:"Rupornis magnirostris", grupo:"outros" },
-  { nome:"Graxaim-do-campo", cientifico:"Lycalopex gymnocercus", grupo:"canideos" },
-  { nome:"Onça-pintada", cientifico:"Panthera onca", grupo:"felinos" },
-  { nome:"Paca", cientifico:"Cuniculus paca", grupo:"roedores" },
-  { nome:"Preá", cientifico:"Cavia aperea", grupo:"roedores" },
-  { nome:"Tapiti", cientifico:"Sylvilagus brasiliensis", grupo:"outros" },
-  { nome:"Tatu-peba", cientifico:"Euphractus sexcinctus", grupo:"xenartros" },
-  { nome:"Zorrilho", cientifico:"Conepatus chinga", grupo:"mustelideos" },
+  { nome:"Anta-brasileira", cientifico:"Tapirus terrestris", grupo:"ungulados", tamanho:2.2 },
+  { nome:"Cuíca-graciosa", cientifico:"Gracilinanus agilis", grupo:"marsupiais", tamanho:0.22 },
+  { nome:"Caxinguelê", cientifico:"Sciurus aestuans", grupo:"roedores", tamanho:0.35 },
+  { nome:"Cachorro-vinagre", cientifico:"Speothos venaticus", grupo:"canideos", tamanho:0.75 },
+  { nome:"Gambá-orelha-branca", cientifico:"Didelphis albiventris", grupo:"marsupiais", tamanho:0.65 },
+  { nome:"Graxaim", cientifico:"Cerdocyon thous", grupo:"canideos", tamanho:1.0 },
+  { nome:"Irara", cientifico:"Eira barbara", grupo:"mustelideos", tamanho:1.05 },
+  { nome:"Jaguatirica", cientifico:"Leopardus pardalis", grupo:"felinos", tamanho:1.3 },
+  { nome:"Macaco-prego", cientifico:"Sapajus nigritus", grupo:"primatas", tamanho:0.85 },
+  { nome:"Mão-pelada", cientifico:"Procyon cancrivorus", grupo:"mustelideos", tamanho:0.9 },
+  { nome:"Morcego-pescador", cientifico:"Noctilio leporinus", grupo:"morcegos", tamanho:0.5 },
+  { nome:"Morcego-bombachudo", cientifico:"Chrotopterus auritus", grupo:"morcegos", tamanho:0.45 },
+  { nome:"Onça-parda", cientifico:"Puma concolor", grupo:"felinos", tamanho:2.0 },
+  { nome:"Ouriço-preto", cientifico:"Chaetomys subspinosus", grupo:"roedores", tamanho:0.55 },
+  { nome:"Quati", cientifico:"Nasua nasua", grupo:"mustelideos", tamanho:1.05 },
+  { nome:"Tamanduá-mirim", cientifico:"Tamandua tetradactyla", grupo:"xenartros", tamanho:1.2 },
+  { nome:"Veado-catingueiro", cientifico:"Mazama sp.", grupo:"ungulados", tamanho:1.1 },
+  { nome:"Gato-do-mato-do-sul", cientifico:"Leopardus guttulus", grupo:"felinos", tamanho:0.85 },
+  { nome:"Lobo-guará", cientifico:"Chrysocyon brachyurus", grupo:"canideos", tamanho:1.6 },
+  { nome:"Gato-maracajá", cientifico:"Leopardus wiedii", grupo:"felinos", tamanho:0.95 },
+  { nome:"Lontra", cientifico:"Lontra longicaudis", grupo:"mustelideos", tamanho:1.1 },
+  { nome:"Ratão-do-banhado", cientifico:"Myocastor coypus", grupo:"roedores", tamanho:0.9 },
+  { nome:"Gambá-orelha-preta", cientifico:"Didelphis aurita", grupo:"marsupiais", tamanho:0.65 },
+  { nome:"Bugio-ruivo", cientifico:"Alouatta clamitans", grupo:"primatas", tamanho:1.2 },
+  { nome:"Capivara", cientifico:"Hydrochoerus hydrochaeris", grupo:"roedores", tamanho:1.2 },
+  { nome:"Cateto", cientifico:"Pecari tajacu", grupo:"ungulados", tamanho:0.95 },
+  { nome:"Cutia", cientifico:"Dasyprocta azarae", grupo:"roedores", tamanho:0.55 },
+  { nome:"Furão-pequeno", cientifico:"Galictis cuja", grupo:"mustelideos", tamanho:0.55 },
+  { nome:"Gato-do-mato", cientifico:"Leopardus tigrinus", grupo:"felinos", tamanho:0.85 },
+  { nome:"Gato-mourisco", cientifico:"Herpailurus yagouaroundi", grupo:"felinos", tamanho:1.05 },
+  { nome:"Graxaim-do-campo", cientifico:"Lycalopex gymnocercus", grupo:"canideos", tamanho:1.0 },
+  { nome:"Onça-pintada", cientifico:"Panthera onca", grupo:"felinos", tamanho:2.4 },
+  { nome:"Paca", cientifico:"Cuniculus paca", grupo:"roedores", tamanho:0.75 },
+  { nome:"Preá", cientifico:"Cavia aperea", grupo:"roedores", tamanho:0.25 },
+  { nome:"Tapiti", cientifico:"Sylvilagus brasiliensis", grupo:"outros", tamanho:0.4 },
+  { nome:"Tatu-peba", cientifico:"Euphractus sexcinctus", grupo:"xenartros", tamanho:0.5 },
+  { nome:"Zorrilho", cientifico:"Conepatus chinga", grupo:"mustelideos", tamanho:0.55 },
 ];
 
 /* Monta a URL "raw" do GitHub a partir do nome exato do arquivo,
    codificando espaços e acentos corretamente. */
 function fileURL(filename){
   return GITHUB_RAW_BASE + filename.split('/').map(encodeURIComponent).join('/');
+}
+
+/* ---------- LISTA FIXA (SEMPRE FUNCIONA, SEM DEPENDER DE REDE) ----------
+   jsDelivr e a API do GitHub às vezes falham: o jsDelivr cacheia a
+   branch "main" por até 7 dias e demora pra "descobrir" arquivos
+   novos, e a API do GitHub tem limite de 60 requisições/hora por IP,
+   fácil de estourar. Por isso, os arquivos que JÁ SABEMOS que existem
+   na pasta /Ilustracoes ficam listados aqui embaixo — assim eles
+   aparecem imediatamente, sem depender de nenhum serviço externo.
+
+   A busca automática (mais abaixo) continua rodando por trás e SOMA
+   a essa lista qualquer arquivo novo que você subir depois, sem
+   precisar editar nada aqui — isto é só uma "garantia" para os que
+   já existem hoje. */
+const STATIC_ILLUSTRATIONS = [
+  "Anta-brasileira.png",
+  "Cachorro vinagre.png",
+  "Caxinguele.png",
+  "Chrotopterus auritus.png",
+  "Chrysocyon brachyurus.png",
+  "Gambá-orelha-branca.png",
+  "Gato-do-mato-do-sul.png",
+  "Gracilinanus agilis.png",
+  "Cerdocyon thous.png",
+  "Morcego-pescador.png",
+  "Onça-parda.png",
+  "Ouriço-preto.png",
+  "Quati.png",
+  "Veado-catingueiro.png",
+  "irara.png",
+  "jaguatirica.png",
+  "macaco prego.png",
+  "mao pelada.png",
+  "tamandua mirim.png",
+];
+function staticIllustrationIndex(){
+  const map = {};
+  STATIC_ILLUSTRATIONS.forEach(filename => {
+    map[normalizeName(stripExt(filename))] = fileURL(filename);
+  });
+  return new Map(Object.entries(map));
+}
+
+/* Normaliza um nome (de espécie ou de arquivo) para comparação:
+   remove acentos, baixa a caixa, troca hífen/underscore por
+   espaço e colapsa espaços — assim "Anta-brasileira",
+   "anta_brasileira" e "Anta   Brasileira" viram a mesma chave. */
+function normalizeName(str){
+  return str
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[-_]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+function stripExt(filename){
+  return filename.replace(/\.[a-z0-9]+$/i, '');
+}
+
+/* Lista a pasta /Ilustracoes e devolve um mapa
+   nome-normalizado -> URL da imagem.
+
+   Usa o jsDelivr (espelho público do GitHub, sem limite de
+   requisições) como fonte principal, com a API oficial do
+   GitHub como reserva — ela funciona igual, mas tem um limite
+   de 60 requisições/hora por IP, fácil de estourar quando a
+   página é recarregada várias vezes seguidas durante testes.
+   O resultado fica em cache por alguns minutos no navegador
+   (sessionStorage) para evitar bater esse limite à toa. */
+const ILLUSTRATION_INDEX_CACHE_KEY = 'mdf-illustration-index-v1';
+const ILLUSTRATION_INDEX_CACHE_MS = 10 * 60 * 1000; // 10 minutos
+const IMG_EXT_RE = /\.(png|jpe?g|webp|gif|svg)$/i;
+
+async function fetchIllustrationIndexFromJsDelivr(){
+  const url = `https://data.jsdelivr.com/v1/package/gh/${GITHUB_OWNER}/${GITHUB_REPO}@${GITHUB_BRANCH}/flat`;
+  const res = await fetch(url);
+  if(!res.ok) throw new Error('jsDelivr respondeu ' + res.status);
+  const data = await res.json();
+  const prefix = `/${ILLUSTRATIONS_DIR}/`;
+  const map = {};
+  (data.files || []).forEach(f => {
+    if(!f.name || !f.name.startsWith(prefix) || !IMG_EXT_RE.test(f.name)) return;
+    const filename = f.name.slice(prefix.length);
+    map[normalizeName(stripExt(filename))] = fileURL(filename);
+  });
+  return map;
+}
+
+async function fetchIllustrationIndexFromGitHubAPI(){
+  const res = await fetch(GITHUB_CONTENTS_API);
+  if(!res.ok) throw new Error('API do GitHub respondeu ' + res.status);
+  const items = await res.json();
+  if(!Array.isArray(items)) throw new Error('resposta inesperada da API do GitHub');
+  const map = {};
+  items.forEach(item => {
+    if(item.type !== 'file' || !IMG_EXT_RE.test(item.name)) return;
+    map[normalizeName(stripExt(item.name))] = item.download_url || fileURL(item.name);
+  });
+  return map;
+}
+
+async function fetchIllustrationIndex(){
+  try{
+    const cached = JSON.parse(sessionStorage.getItem(ILLUSTRATION_INDEX_CACHE_KEY) || 'null');
+    if(cached && (Date.now() - cached.time) < ILLUSTRATION_INDEX_CACHE_MS){
+      return new Map(Object.entries(cached.map));
+    }
+  }catch(e){ /* sessionStorage indisponível: segue sem cache */ }
+
+  let map = null;
+  try{
+    map = await fetchIllustrationIndexFromJsDelivr();
+  }catch(err){
+    console.warn('Listagem via jsDelivr falhou (' + err.message + '), tentando a API do GitHub…');
+    try{
+      map = await fetchIllustrationIndexFromGitHubAPI();
+    }catch(err2){
+      console.warn('Listagem via API do GitHub também falhou:', err2);
+      return null;
+    }
+  }
+
+  try{
+    sessionStorage.setItem(ILLUSTRATION_INDEX_CACHE_KEY, JSON.stringify({ time: Date.now(), map }));
+  }catch(e){ /* sessionStorage indisponível: só não cacheia */ }
+
+  return new Map(Object.entries(map));
 }
 
 function placeholderSVG(nome){
@@ -727,6 +1538,13 @@ function placeholderSVG(nome){
 const main = document.getElementById('especies');
 document.getElementById('count-all').textContent = SPECIES.length;
 
+// O número real de ilustrações publicadas só é conhecido depois que
+// matchIllustrations() consulta o GitHub — aqui só deixamos o rótulo
+// pronto, mostrando o total de espécies do catálogo.
+document.getElementById('progressCount').textContent = `0/${SPECIES.length}`;
+
+const cardRegistry = []; // { species, groupKey, el }
+
 Object.keys(GROUPS).forEach(key => {
   const members = SPECIES.filter(s => s.grupo === key);
   if(!members.length) return;
@@ -736,7 +1554,7 @@ Object.keys(GROUPS).forEach(key => {
   section.dataset.group = key;
 
   section.innerHTML = `
-    <div class="group-head">
+    <div class="group-head reveal">
       <h2>${GROUPS[key].title}</h2>
       <span class="count">${members.length}</span>
       <span class="group-line"></span>
@@ -748,54 +1566,509 @@ Object.keys(GROUPS).forEach(key => {
   const grid = section.querySelector('.grid');
   members.forEach(s => {
     const fallback = placeholderSVG(s.nome);
-    const url = s.arquivo ? fileURL(s.arquivo) : fallback;
+
+    // "entry" é um objeto mutável: começa apontando pro placeholder
+    // e, se a busca no GitHub encontrar um arquivo com nome idêntico
+    // ao científico ou ao popular, entry.url é atualizado — o clique
+    // no card sempre lê entry.url no momento do clique, então a
+    // ficha abre com a imagem certa mesmo que a troca tenha
+    // acontecido depois da montagem inicial da página.
+    const entry = { species: s, groupKey: key, url: fallback, matched: false };
 
     const card = document.createElement('article');
-    card.className = 'card';
+    card.className = 'card reveal';
+    card.tabIndex = 0;
+    card.setAttribute('role','button');
+    card.setAttribute('aria-label', `Ver ficha completa de ${s.nome}`);
+    card.dataset.nome = s.nome.toLowerCase();
+    card.dataset.cientifico = s.cientifico.toLowerCase();
+    card.classList.add('is-placeholder');
     card.innerHTML = `
       <div class="card-media">
         <span class="card-tag">${GROUPS[key].title}</span>
-        <img src="${url}" alt="Ilustração de ${s.nome} (${s.cientifico})"
-             onerror="this.onerror=null; this.src='${fallback}'; this.closest('.card').classList.add('is-placeholder');">
+        <img src="${fallback}" alt="Ilustração de ${s.nome} (${s.cientifico})" loading="lazy">
       </div>
       <div class="card-body">
         <h3>${s.nome}</h3>
         <span class="sci">${s.cientifico}</span>
         <p>${LOREM}</p>
-        <span class="placeholder-note ph-flag" hidden>Ilustração em produção</span>
+        <span class="placeholder-note ph-flag">Ilustração em produção</span>
       </div>
     `;
     const img = card.querySelector('img');
     const flag = card.querySelector('.ph-flag');
-    if(!s.arquivo){
-      // ainda não há ilustração cadastrada para esta espécie
-      flag.hidden = false;
-      card.classList.add('is-placeholder');
-    } else {
-      // arquivo cadastrado, mas mostra o selo se o link quebrar
-      // (ex: arquivo renomeado/removido no GitHub)
-      img.addEventListener('error', () => {
-        flag.hidden = false;
-        card.classList.add('is-placeholder');
-      }, { once:true });
-    }
+
+    card.addEventListener('click', () => openModal(entry.species, entry.url, GROUPS[entry.groupKey].title));
+    card.addEventListener('keydown', (e) => {
+      if(e.key === 'Enter' || e.key === ' '){
+        e.preventDefault();
+        openModal(entry.species, entry.url, GROUPS[entry.groupKey].title);
+      }
+    });
+
     grid.appendChild(card);
+    entry.el = card;
+    entry.imgEl = img;
+    entry.flagEl = flag;
+    cardRegistry.push(entry);
   });
 
   main.appendChild(section);
 });
 
-/* ---------- FILTROS ---------- */
+/* ---------- CASAMENTO AUTOMÁTICO COM AS ILUSTRAÇÕES DO GITHUB ----------
+   Busca a listagem da pasta /Ilustracoes e, para cada espécie,
+   procura um arquivo cujo nome (normalizado) seja idêntico ao
+   nome científico OU ao nome popular — nessa ordem de prioridade. */
+function applyIndexToCards(index){
+  cardRegistry.forEach(entry => {
+    if(entry.matched) return; // já resolvido (pela lista fixa ou por uma rodada anterior)
+    const sciKey  = normalizeName(entry.species.cientifico);
+    const nomeKey = normalizeName(entry.species.nome);
+    const matchUrl = index.get(sciKey) || index.get(nomeKey);
+    if(!matchUrl) return;
+
+    entry.url = matchUrl;
+    entry.matched = true;
+    entry.imgEl.onerror = () => {
+      // arquivo listado mas que falhou ao carregar (raro): volta pro placeholder
+      entry.imgEl.onerror = null;
+      const fb = placeholderSVG(entry.species.nome);
+      entry.imgEl.src = fb;
+      entry.url = fb;
+      entry.matched = false;
+      entry.flagEl.hidden = false;
+      entry.el.classList.add('is-placeholder');
+    };
+    entry.imgEl.src = matchUrl;
+    entry.flagEl.hidden = true;
+    entry.el.classList.remove('is-placeholder');
+  });
+
+  const matchedCount = cardRegistry.filter(e => e.matched).length;
+  document.getElementById('progressCount').textContent = `${matchedCount}/${cardRegistry.length}`;
+  document.getElementById('progressFill').style.width = (matchedCount / cardRegistry.length * 100) + '%';
+}
+
+async function matchIllustrations(){
+  // 1) Aplica a lista fixa IMEDIATAMENTE — não depende de rede nenhuma,
+  //    então as ilustrações já conhecidas aparecem na hora, mesmo que
+  //    jsDelivr e a API do GitHub estejam fora do ar ou com limite excedido.
+  applyIndexToCards(staticIllustrationIndex());
+
+  // 2) Em segundo plano, tenta descobrir arquivos NOVOS (que ainda não
+  //    estão na lista fixa acima) via jsDelivr / API do GitHub. Se falhar,
+  //    não tem problema: os que já foram casados no passo 1 continuam.
+  const index = await fetchIllustrationIndex();
+  if(!index) return;
+  applyIndexToCards(index);
+}
+matchIllustrations();
+
+// Começa a buscar, em segundo plano, a foto real e o mapa de
+// ocorrência de todas as espécies — assim a ficha de cada uma já
+// abre pronta, sem o usuário precisar esperar.
+setTimeout(preloadAllSpeciesData, 0);
+
+/* ===========================================================
+   MODAL — FICHA COMPLETA DA ESPÉCIE
+   =========================================================== */
+
+const modalOverlay   = document.getElementById('modalOverlay');
+const modalClose     = document.getElementById('modalClose');
+const modalIllustr   = document.getElementById('modalIllustration');
+const modalIllustrWrap = document.getElementById('modalIllustrationWrap');
+const modalGroupTag  = document.getElementById('modalGroupTag');
+const modalName      = document.getElementById('modalName');
+const modalSci       = document.getElementById('modalSci');
+const modalDesc      = document.getElementById('modalDesc');
+const modalPhotoBadge= document.getElementById('modalPhotoBadge');
+const modalRealPhoto = document.getElementById('modalRealPhoto');
+const modalPhotoCredit = document.getElementById('modalPhotoCredit');
+const modalMapEl     = document.getElementById('modalMap');
+
+// ---- Comparativo de tamanho (pessoa de 1,70 m) ----
+const compareToggle   = document.getElementById('compareToggle');
+const compareStage    = document.getElementById('compareStage');
+const compareHumanSvg = document.getElementById('compareHumanSvg');
+const compareAnimalImg= document.getElementById('compareAnimalImg');
+const compareAnimalLabel = document.getElementById('compareAnimalLabel');
+const compareCaption  = document.getElementById('compareCaption');
+const HUMAN_HEIGHT_M  = 1.70;
+
+let currentSpecies = null;
+let comparing = false;
+
+function formatMeters(m){
+  return (m < 1 ? Math.round(m*100) + ' cm' : m.toFixed(2).replace(/0$/,'').replace(/\.$/,'') + ' m');
+}
+
+function applyComparisonScale(){
+  if(!currentSpecies || !currentSpecies.tamanho) return;
+  const rect = compareStage.getBoundingClientRect();
+  const availableH = Math.max(rect.height - 46, 90);
+  const humanPxHeight = Math.min(availableH * 0.82, 230);
+  const pxPerMeter = humanPxHeight / HUMAN_HEIGHT_M;
+  const animalPxHeight = Math.min(Math.max(currentSpecies.tamanho * pxPerMeter, 22), availableH);
+
+  compareHumanSvg.style.height = humanPxHeight + 'px';
+  compareHumanSvg.style.width = 'auto';
+  compareAnimalImg.style.height = animalPxHeight + 'px';
+  compareAnimalImg.style.width = 'auto';
+}
+
+function setComparing(on){
+  comparing = on;
+  modalIllustrWrap.classList.toggle('comparing', on);
+  compareToggle.classList.toggle('active', on);
+  compareToggle.setAttribute('aria-pressed', on ? 'true' : 'false');
+  compareToggle.textContent = on ? '🧍 Ver ilustração' : '🧍 Ligar comparativo (1,70 m)';
+
+  if(on){
+    requestAnimationFrame(applyComparisonScale);
+    if(currentSpecies && currentSpecies.tamanho){
+      compareCaption.style.display = 'block';
+      compareCaption.textContent = `Comparação aproximada: ${currentSpecies.nome} tem cerca de ${formatMeters(currentSpecies.tamanho)} de comprimento total, ao lado de uma pessoa de 1,70 m.`;
+    }
+  } else {
+    compareCaption.style.display = 'none';
+  }
+}
+
+compareToggle.addEventListener('click', () => setComparing(!comparing));
+window.addEventListener('resize', () => { if(comparing) applyComparisonScale(); });
+
+function openModal(s, illustrationUrl, groupTitle){
+  modalGroupTag.innerHTML = groupTitle;
+  modalName.textContent = s.nome;
+  modalSci.textContent = s.cientifico;
+  modalDesc.textContent = LOREM;
+
+  modalIllustr.src = illustrationUrl;
+  modalIllustr.alt = `Ilustração de ${s.nome} (${s.cientifico})`;
+  modalIllustr.onerror = () => { modalIllustr.onerror = null; modalIllustr.src = placeholderSVG(s.nome); };
+
+  currentSpecies = s;
+  compareAnimalImg.src = illustrationUrl;
+  compareAnimalImg.alt = `Ilustração de ${s.nome} em comparação com uma pessoa de 1,70 m`;
+  compareAnimalImg.onerror = () => { compareAnimalImg.onerror = null; compareAnimalImg.src = placeholderSVG(s.nome); };
+  compareAnimalLabel.textContent = s.tamanho ? `${s.nome} · ≈ ${formatMeters(s.tamanho)}` : s.nome;
+  compareToggle.style.display = s.tamanho ? 'inline-flex' : 'none';
+  setComparing(false);
+
+  modalOverlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
+
+  loadRealPhoto(s.cientifico);
+  loadOccurrenceMap(s.cientifico);
+}
+
+const photoDataCache = new Map();
+const occurrenceDataCache = new Map();
+
+async function fetchPhotoData(sciName){
+  try{
+    const taxonRes = await fetch(`https://api.inaturalist.org/v1/taxa?q=${encodeURIComponent(sciName)}&rank=species&per_page=1`);
+    const taxonData = await taxonRes.json();
+    const taxon = taxonData.results && taxonData.results[0];
+    if(!taxon) return null;
+
+    let obsRes = await fetch(`https://api.inaturalist.org/v1/observations?taxon_id=${taxon.id}&photos=true&per_page=50&quality_grade=research&order_by=created_at`);
+    let obsData = await obsRes.json();
+    let candidates = (obsData.results || []).filter(o => o.photos && o.photos.length);
+
+    if(!candidates.length){
+      obsRes = await fetch(`https://api.inaturalist.org/v1/observations?taxon_id=${taxon.id}&photos=true&per_page=50&order_by=created_at`);
+      obsData = await obsRes.json();
+      candidates = (obsData.results || []).filter(o => o.photos && o.photos.length);
+    }
+    if(!candidates.length) return null;
+
+    const obs = candidates[Math.floor(Math.random() * candidates.length)];
+    const photo = obs.photos[0];
+    const url = (photo.url || '').replace('square', 'medium');
+    const author = obs.user ? (obs.user.name || obs.user.login) : 'iNaturalist';
+    const license = photo.license_code ? photo.license_code.toUpperCase() : 'todos os direitos reservados';
+
+    const preheat = new Image();
+    preheat.src = url;
+
+    return { url, author, license, obsId: obs.id };
+  }catch(err){
+    return null;
+  }
+}
+
+function getPhotoData(sciName){
+  if(!photoDataCache.has(sciName)){
+    photoDataCache.set(sciName, fetchPhotoData(sciName));
+  }
+  return photoDataCache.get(sciName);
+}
+
+async function fetchOccurrenceData(sciName){
+  try{
+    const occRes = await fetch(`https://api.gbif.org/v1/occurrence/search?scientificName=${encodeURIComponent(sciName)}&country=BR&hasCoordinate=true&limit=300`);
+    const occData = await occRes.json();
+    const points = (occData.results || [])
+      .map(o => [o.decimalLongitude, o.decimalLatitude])
+      .filter(([lon, lat]) => typeof lon === 'number' && typeof lat === 'number');
+    return points;
+  }catch(err){
+    return null;
+  }
+}
+
+function getOccurrenceData(sciName){
+  if(!occurrenceDataCache.has(sciName)){
+    occurrenceDataCache.set(sciName, fetchOccurrenceData(sciName));
+  }
+  return occurrenceDataCache.get(sciName);
+}
+
+async function runWithConcurrency(tasks, limit){
+  let i = 0;
+  const workers = new Array(Math.min(limit, tasks.length)).fill(0).map(async () => {
+    while(i < tasks.length){
+      const idx = i++;
+      try{ await tasks[idx](); }catch(e){}
+    }
+  });
+  await Promise.all(workers);
+}
+
+function preloadAllSpeciesData(){
+  getBrazilFeature();
+  const tasks = [];
+  SPECIES.forEach(s => {
+    tasks.push(() => getPhotoData(s.cientifico));
+    tasks.push(() => getOccurrenceData(s.cientifico));
+  });
+  runWithConcurrency(tasks, 5);
+}
+
+function closeModal(){
+  modalOverlay.classList.remove('open');
+  document.body.style.overflow = '';
+}
+modalClose.addEventListener('click', closeModal);
+modalOverlay.addEventListener('click', (e) => { if(e.target === modalOverlay) closeModal(); });
+document.addEventListener('keydown', (e) => { if(e.key === 'Escape' && modalOverlay.classList.contains('open')) closeModal(); });
+
+async function loadRealPhoto(sciName){
+  const myToken = ++photoRequestToken;
+  modalPhotoBadge.classList.add('loading');
+  modalPhotoBadge.classList.remove('empty');
+  modalRealPhoto.removeAttribute('src');
+  modalPhotoCredit.textContent = 'Buscando foto…';
+
+  const data = await getPhotoData(sciName);
+  if(myToken !== photoRequestToken) return;
+
+  if(!data){
+    modalPhotoBadge.classList.remove('loading');
+    modalPhotoBadge.classList.add('empty');
+    modalPhotoCredit.textContent = 'Sem foto disponível no iNaturalist';
+    return;
+  }
+
+  modalRealPhoto.src = data.url;
+  modalPhotoCredit.innerHTML = `${data.author} · <a href="https://www.inaturalist.org/observations/${data.obsId}" target="_blank" rel="noopener" style="color:inherit;">iNaturalist</a> (${data.license})`;
+  modalPhotoBadge.classList.remove('loading');
+}
+
+let brazilFeaturePromise = null;
+function getBrazilFeature(){
+  if(!brazilFeaturePromise){
+    brazilFeaturePromise = fetch('https://unpkg.com/world-atlas@2/countries-110m.json')
+      .then(r => r.json())
+      .then(topo => {
+        const countries = topojson.feature(topo, topo.objects.countries);
+        return countries.features.find(f => f.id === '076');
+      });
+  }
+  return brazilFeaturePromise;
+}
+
+async function loadOccurrenceMap(sciName){
+  const myToken = ++mapRequestToken;
+  modalMapEl.innerHTML = '<span class="map-loading">Carregando mapa…</span>';
+
+  let feature;
+  try{
+    feature = await getBrazilFeature();
+  }catch(err){
+    if(myToken !== mapRequestToken) return;
+    modalMapEl.innerHTML = '<span class="map-loading">Não foi possível carregar o mapa.</span>';
+    return;
+  }
+  if(myToken !== mapRequestToken || !feature) return;
+
+  const width = modalMapEl.clientWidth || 216;
+  const height = 240;
+  const projection = d3.geoMercator().fitSize([width, height], feature);
+  const path = d3.geoPath(projection);
+
+  const svg = d3.create('svg').attr('viewBox', `0 0 ${width} ${height}`).attr('width', '100%').attr('height', height);
+  svg.append('path').datum(feature).attr('d', path).attr('fill', '#284d29').attr('stroke', '#7ea854').attr('stroke-width', 1);
+
+  modalMapEl.innerHTML = '';
+  modalMapEl.appendChild(svg.node());
+
+  const points = await getOccurrenceData(sciName);
+  if(myToken !== mapRequestToken) return;
+
+  if(points === null){
+    const note = document.createElement('p');
+    note.className = 'map-empty-note';
+    note.textContent = 'Não foi possível carregar os pontos de ocorrência agora.';
+    modalMapEl.appendChild(note);
+    return;
+  }
+
+  if(!points.length){
+    const note = document.createElement('p');
+    note.className = 'map-empty-note';
+    note.textContent = 'Sem registros públicos suficientes no GBIF para esta espécie no momento.';
+    modalMapEl.appendChild(note);
+    return;
+  }
+
+  const dotsG = svg.append('g');
+  points.forEach(([lon, lat]) => {
+    const p = projection([lon, lat]);
+    if(!p) return;
+    dotsG.append('circle')
+      .attr('cx', p[0]).attr('cy', p[1]).attr('r', 2.3)
+      .attr('fill', '#c79a2e').attr('fill-opacity', 0.75)
+      .attr('stroke', '#1e3820').attr('stroke-width', 0.4);
+  });
+}
+
+/* ---------- FILTROS + BUSCA ---------- */
 const chips = document.querySelectorAll('.chip');
+const searchInput = document.getElementById('searchInput');
+const noResultsEl = document.getElementById('noResults');
+let activeFilter = 'all';
+
+function normalize(str){
+  return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+}
+
+function applyFilters(){
+  const term = normalize(searchInput.value.trim());
+  let anyVisible = false;
+
+  document.querySelectorAll('.group').forEach(group => {
+    const groupKey = group.dataset.group;
+    const groupMatchesFilter = (activeFilter === 'all' || groupKey === activeFilter);
+    let groupHasVisibleCard = false;
+
+    group.querySelectorAll('.card').forEach(card => {
+      const matchesSearch = !term || normalize(card.dataset.nome).includes(term) || normalize(card.dataset.cientifico).includes(term);
+      const visible = groupMatchesFilter && matchesSearch;
+      card.style.display = visible ? '' : 'none';
+      if(visible) groupHasVisibleCard = true;
+    });
+
+    group.style.display = groupHasVisibleCard ? '' : 'none';
+    if(groupHasVisibleCard) anyVisible = true;
+  });
+
+  noResultsEl.classList.toggle('show', !anyVisible);
+}
+
 chips.forEach(chip => {
   chip.addEventListener('click', () => {
     chips.forEach(c => c.classList.remove('active'));
     chip.classList.add('active');
-    const filter = chip.dataset.filter;
-    document.querySelectorAll('.group').forEach(group => {
-      group.style.display = (filter === 'all' || group.dataset.group === filter) ? '' : 'none';
-    });
+    activeFilter = chip.dataset.filter;
+    applyFilters();
   });
+});
+searchInput.addEventListener('input', applyFilters);
+
+/* ---------- ESPÉCIE ALEATÓRIA ---------- */
+document.getElementById('randomBtn').addEventListener('click', () => {
+  const pick = cardRegistry[Math.floor(Math.random() * cardRegistry.length)];
+  if(!pick) return;
+
+  chips.forEach(c => c.classList.remove('active'));
+  document.querySelector('.chip[data-filter="all"]').classList.add('active');
+  activeFilter = 'all';
+  searchInput.value = '';
+  applyFilters();
+
+  pick.el.scrollIntoView({ behavior:'smooth', block:'center' });
+  pick.el.style.transition = 'box-shadow .3s ease';
+  pick.el.style.boxShadow = '0 0 0 3px var(--gold)';
+  setTimeout(() => { pick.el.style.boxShadow = ''; }, 1400);
+  setTimeout(() => openModal(pick.species, pick.url, GROUPS[pick.groupKey].title), 550);
+});
+
+/* ---------- MODO NOTURNO ---------- */
+const themeToggle = document.getElementById('themeToggle');
+const themeIcon = document.getElementById('themeIcon');
+const themeLabel = document.getElementById('themeLabel');
+
+function setTheme(theme){
+  document.documentElement.setAttribute('data-theme', theme);
+  themeToggle.setAttribute('aria-pressed', theme === 'dark');
+  themeIcon.textContent = theme === 'dark' ? '☀️' : '🌙';
+  themeLabel.textContent = theme === 'dark' ? 'Modo claro' : 'Modo noturno';
+  try{ localStorage.setItem('mdf-theme', theme); }catch(e){}
+}
+
+(function initTheme(){
+  let saved = null;
+  try{ saved = localStorage.getItem('mdf-theme'); }catch(e){}
+  const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  setTheme(saved || (prefersDark ? 'dark' : 'light'));
+})();
+
+themeToggle.addEventListener('click', () => {
+  const current = document.documentElement.getAttribute('data-theme');
+  setTheme(current === 'dark' ? 'light' : 'dark');
+});
+
+/* ---------- REVEAL ON SCROLL ---------- */
+const prefersReducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+if(!prefersReducedMotion && 'IntersectionObserver' in window){
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if(entry.isIntersecting){
+        entry.target.classList.add('in-view');
+        io.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+} else {
+  document.querySelectorAll('.reveal').forEach(el => el.classList.add('in-view'));
+}
+
+/* ---------- BOTÃO VOLTAR AO TOPO ---------- */
+const toTopBtn = document.getElementById('toTop');
+window.addEventListener('scroll', () => {
+  toTopBtn.classList.toggle('show', window.scrollY > 700);
+}, { passive:true });
+toTopBtn.addEventListener('click', () => window.scrollTo({ top:0, behavior:'smooth' }));
+
+/* ---------- LINK DIRETO PARA UMA SEÇÃO (ex.: #especies) ----------
+   Se a página foi aberta com um link direto para uma seção (o botão
+   "Catálogo" gera algo como .../#especies), a gente NÃO deixa o
+   navegador pular pra lá instantaneamente (isso fazia a página abrir
+   já dentro do catálogo, sem mostrar a capa nem carregar o conteúdo).
+   Em vez disso, espera tudo carregar e rola suavemente até o
+   destino — assim quem recebe o link ainda chega direto na seção
+   certa, só que de um jeito mais bonito e sem susto. */
+window.addEventListener('load', () => {
+  const hash = window.__deepLinkHash;
+  if(!hash) return;
+  setTimeout(() => {
+    const target = document.querySelector(hash);
+    if(target) target.scrollIntoView({ behavior:'smooth', block:'start' });
+  }, 400);
 });
 </script>
 </body>
