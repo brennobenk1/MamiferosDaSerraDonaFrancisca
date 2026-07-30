@@ -1,0 +1,59 @@
+# Gera automaticamente o arquivo Ilustracoes/index.json com a lista de
+# todas as imagens da pasta. Roda sozinho toda vez que você adiciona,
+# renomeia ou remove uma ilustração — assim o site nunca depende de
+# jsDelivr nem do limite de requisições da API do GitHub.
+name: Gerar manifesto de ilustrações
+
+on:
+  push:
+    paths:
+      - 'Ilustracoes/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: manifesto-ilustracoes
+  cancel-in-progress: true
+
+jobs:
+  gerar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Montar Ilustracoes/index.json
+        run: |
+          python3 - <<'EOF'
+          import os, re, json
+
+          PASTA = 'Ilustracoes'
+          EXTS  = re.compile(r'\.(png|jpe?g|webp|gif|svg)$', re.IGNORECASE)
+
+          arquivos = sorted(
+              nome for nome in os.listdir(PASTA)
+              if EXTS.search(nome) and os.path.isfile(os.path.join(PASTA, nome))
+          )
+
+          destino = os.path.join(PASTA, 'index.json')
+          with open(destino, 'w', encoding='utf-8') as f:
+              json.dump(arquivos, f, ensure_ascii=False, indent=2)
+              f.write('\n')
+
+          print(f'{len(arquivos)} ilustracoes no manifesto:')
+          for a in arquivos:
+              print('  -', a)
+          EOF
+
+      - name: Publicar se mudou
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add Ilustracoes/index.json
+          if git diff --staged --quiet; then
+            echo "Manifesto ja estava atualizado, nada a fazer."
+          else
+            git commit -m "chore: atualiza manifesto de ilustracoes"
+            git push
+          fi

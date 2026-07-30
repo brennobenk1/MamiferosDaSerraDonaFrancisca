@@ -1357,7 +1357,7 @@ const SPECIES = [
   { nome:"Morcego-pescador", cientifico:"Noctilio leporinus", grupo:"morcegos", tamanho:0.5 },
   { nome:"Morcego-bombachudo", cientifico:"Chrotopterus auritus", grupo:"morcegos", tamanho:0.45 },
   { nome:"Onça-parda", cientifico:"Puma concolor", grupo:"felinos", tamanho:2.0 },
-  { nome:"Ouriço-preto", cientifico:"Chaetomys subspinosus", grupo:"roedores", tamanho:0.55 },
+  { nome:"Ouriço-cacheiro", cientifico:"Coendou spinosus", grupo:"roedores", tamanho:0.75 },
   { nome:"Quati", cientifico:"Nasua nasua", grupo:"mustelideos", tamanho:1.05 },
   { nome:"Tamanduá-mirim", cientifico:"Tamandua tetradactyla", grupo:"xenartros", tamanho:1.2 },
   { nome:"Veado-catingueiro", cientifico:"Mazama sp.", grupo:"ungulados", tamanho:1.1 },
@@ -1383,10 +1383,24 @@ const SPECIES = [
   { nome:"Zorrilho", cientifico:"Conepatus chinga", grupo:"mustelideos", tamanho:0.55 },
 ];
 
-/* Monta a URL "raw" do GitHub a partir do nome exato do arquivo,
-   codificando espaços e acentos corretamente. */
+/* Monta a URL da ilustração a partir do nome exato do arquivo,
+   codificando espaços e acentos corretamente.
+
+   As imagens ficam no MESMO repositório que o site, então usamos um
+   caminho relativo (mesma origem): sem limite de requisições, sem
+   cache de CDN de terceiros e bem mais rápido. Se por algum motivo o
+   arquivo não for servido pelo GitHub Pages, rawFallback() devolve a
+   URL equivalente no raw.githubusercontent.com como plano B. */
+function encodePath(filename){
+  return filename.split('/').map(encodeURIComponent).join('/');
+}
 function fileURL(filename){
-  return GITHUB_RAW_BASE + filename.split('/').map(encodeURIComponent).join('/');
+  return ILLUSTRATIONS_DIR + '/' + encodePath(filename);
+}
+function rawFallback(url){
+  const prefix = ILLUSTRATIONS_DIR + '/';
+  if(url.startsWith(prefix)) return GITHUB_RAW_BASE + url.slice(prefix.length);
+  return null;
 }
 
 /* ---------- LISTA FIXA (SEMPRE FUNCIONA, SEM DEPENDER DE REDE) ----------
@@ -1404,18 +1418,24 @@ function fileURL(filename){
 const STATIC_ILLUSTRATIONS = [
   "Anta-brasileira.png",
   "Cachorro vinagre.png",
+  "Cateto.png",
   "Caxinguele.png",
+  "Cerdocyon thous.png",
   "Chrotopterus auritus.png",
   "Chrysocyon brachyurus.png",
+  "Conepatus chinga.png",
+  "Cuniculus paca.png",
+  "Cutia.png",
   "Gambá-orelha-branca.png",
   "Gato-do-mato-do-sul.png",
   "Gracilinanus agilis.png",
-  "Cerdocyon thous.png",
   "Morcego-pescador.png",
   "Onça-parda.png",
-  "Ouriço-preto.png",
+  "Paca.png",
+  "Pecari tajacu.png",
   "Quati.png",
   "Veado-catingueiro.png",
+  "Zorrilho.png",
   "irara.png",
   "jaguatirica.png",
   "macaco prego.png",
@@ -1456,9 +1476,27 @@ function stripExt(filename){
    página é recarregada várias vezes seguidas durante testes.
    O resultado fica em cache por alguns minutos no navegador
    (sessionStorage) para evitar bater esse limite à toa. */
-const ILLUSTRATION_INDEX_CACHE_KEY = 'mdf-illustration-index-v1';
+const ILLUSTRATION_INDEX_CACHE_KEY = 'mdf-illustration-index-v2';
 const ILLUSTRATION_INDEX_CACHE_MS = 10 * 60 * 1000; // 10 minutos
 const IMG_EXT_RE = /\.(png|jpe?g|webp|gif|svg)$/i;
+
+/* Fonte principal: manifesto gerado automaticamente pelo GitHub Actions
+   a cada push na pasta /Ilustracoes (.github/workflows/manifesto.yml).
+   É um arquivo do próprio site, então não tem limite de requisições
+   nem cache de CDN externo. */
+async function fetchIllustrationIndexFromManifest(){
+  const url = `${ILLUSTRATIONS_DIR}/index.json?v=${Date.now()}`;
+  const res = await fetch(url, { cache: 'no-store' });
+  if(!res.ok) throw new Error('manifesto respondeu ' + res.status);
+  const list = await res.json();
+  if(!Array.isArray(list)) throw new Error('manifesto em formato inesperado');
+  const map = {};
+  list.forEach(filename => {
+    if(typeof filename !== 'string' || !IMG_EXT_RE.test(filename)) return;
+    map[normalizeName(stripExt(filename))] = fileURL(filename);
+  });
+  return map;
+}
 
 async function fetchIllustrationIndexFromJsDelivr(){
   const url = `https://data.jsdelivr.com/v1/package/gh/${GITHUB_OWNER}/${GITHUB_REPO}@${GITHUB_BRANCH}/flat`;
@@ -1496,17 +1534,26 @@ async function fetchIllustrationIndex(){
     }
   }catch(e){ /* sessionStorage indisponível: segue sem cache */ }
 
+  // Tenta as fontes em ordem: manifesto local (rápido e sem limite),
+  // depois jsDelivr, depois a API do GitHub. Basta uma funcionar.
+  const sources = [
+    ['manifesto local',   fetchIllustrationIndexFromManifest],
+    ['jsDelivr',          fetchIllustrationIndexFromJsDelivr],
+    ['API do GitHub',     fetchIllustrationIndexFromGitHubAPI],
+  ];
+
   let map = null;
-  try{
-    map = await fetchIllustrationIndexFromJsDelivr();
-  }catch(err){
-    console.warn('Listagem via jsDelivr falhou (' + err.message + '), tentando a API do GitHub…');
+  for(const [label, fn] of sources){
     try{
-      map = await fetchIllustrationIndexFromGitHubAPI();
-    }catch(err2){
-      console.warn('Listagem via API do GitHub também falhou:', err2);
-      return null;
+      map = await fn();
+      break;
+    }catch(err){
+      console.warn(`Listagem via ${label} falhou: ${err.message}`);
     }
+  }
+  if(!map){
+    console.warn('Nenhuma fonte de listagem funcionou — usando só a lista fixa.');
+    return null;
   }
 
   try{
@@ -1631,7 +1678,23 @@ function applyIndexToCards(index){
     entry.url = matchUrl;
     entry.matched = true;
     entry.imgEl.onerror = () => {
-      // arquivo listado mas que falhou ao carregar (raro): volta pro placeholder
+      // 1ª falha: tenta a mesma imagem pelo raw.githubusercontent.com
+      const alt = rawFallback(entry.imgEl.getAttribute('src') || '');
+      if(alt){
+        entry.imgEl.onerror = () => {
+          // 2ª falha: aí sim, volta pro placeholder
+          entry.imgEl.onerror = null;
+          const fb = placeholderSVG(entry.species.nome);
+          entry.imgEl.src = fb;
+          entry.url = fb;
+          entry.matched = false;
+          entry.flagEl.hidden = false;
+          entry.el.classList.add('is-placeholder');
+        };
+        entry.url = alt;
+        entry.imgEl.src = alt;
+        return;
+      }
       entry.imgEl.onerror = null;
       const fb = placeholderSVG(entry.species.nome);
       entry.imgEl.src = fb;
