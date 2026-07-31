@@ -1400,7 +1400,106 @@ function fileURL(filename){
 function rawFallback(url){
   const prefix = ILLUSTRATIONS_DIR + '/';
   if(url.startsWith(prefix)) return GITHUB_RAW_BASE + url.slice(prefix.length);
-  return null;
+  return null; // já é um link absoluto (raw.githubusercontent) — sem plano B
+}
+
+/* ===========================================================
+   LINKS DIRETOS DAS ILUSTRAÇÕES  ←←← EDITE AQUI
+   ===========================================================
+   Cada espécie aponta para o link da sua ilustração no GitHub.
+   Esta lista tem PRIORIDADE MÁXIMA: se a espécie estiver aqui
+   com um link, é esse link que o site usa, sem depender de
+   busca automática, de jsDelivr nem da API do GitHub.
+
+   COMO ADICIONAR UMA ILUSTRAÇÃO NOVA:
+     1. Suba o arquivo na pasta /Ilustracoes do repositório.
+     2. Clique no arquivo no GitHub e copie o link da barra
+        de endereço (o que tem "/blob/" no meio).
+     3. Cole entre as aspas na linha da espécie correspondente.
+
+   O nome da espécie (à esquerda) tem que ser IGUAL ao campo
+   "nome" lá na lista SPECIES acima — é ele que faz a ligação.
+
+   Pode colar tanto o link "/blob/" quanto o "raw.githubusercontent"
+   quanto o "?raw=1": toDirectImageURL() converte todos para o
+   endereço real da imagem automaticamente. Deixar "" (vazio)
+   significa "ainda não tenho essa ilustração" — o card mostra o
+   selo de "ilustração em produção". */
+const ILLUSTRATION_LINKS = {
+  "Anta-brasileira":      "https://github.com/brennobenk1/MamiferosDaSerraDonaFrancisca/blob/main/Ilustracoes/Anta-brasileira.png",
+  "Cuíca-graciosa":       "https://github.com/brennobenk1/MamiferosDaSerraDonaFrancisca/blob/main/Ilustracoes/Gracilinanus%20agilis.png",
+  "Caxinguelê":           "https://github.com/brennobenk1/MamiferosDaSerraDonaFrancisca/blob/main/Ilustracoes/Caxinguele.png",
+  "Cachorro-vinagre":     "https://github.com/brennobenk1/MamiferosDaSerraDonaFrancisca/blob/main/Ilustracoes/Cachorro%20vinagre.png",
+  "Gambá-orelha-branca":  "https://github.com/brennobenk1/MamiferosDaSerraDonaFrancisca/blob/main/Ilustracoes/Gamb%C3%A1-orelha-branca.png",
+  "Graxaim":              "https://github.com/brennobenk1/MamiferosDaSerraDonaFrancisca/blob/main/Ilustracoes/Cerdocyon%20thous.png",
+  "Irara":                "https://github.com/brennobenk1/MamiferosDaSerraDonaFrancisca/blob/main/Ilustracoes/irara.png",
+  "Jaguatirica":          "https://github.com/brennobenk1/MamiferosDaSerraDonaFrancisca/blob/main/Ilustracoes/jaguatirica.png",
+  "Macaco-prego":         "https://github.com/brennobenk1/MamiferosDaSerraDonaFrancisca/blob/main/Ilustracoes/macaco%20prego.png",
+  "Mão-pelada":           "https://github.com/brennobenk1/MamiferosDaSerraDonaFrancisca/blob/main/Ilustracoes/mao%20pelada.png",
+  "Morcego-pescador":     "https://github.com/brennobenk1/MamiferosDaSerraDonaFrancisca/blob/main/Ilustracoes/Morcego-pescador.png",
+  "Morcego-bombachudo":   "https://github.com/brennobenk1/MamiferosDaSerraDonaFrancisca/blob/main/Ilustracoes/Chrotopterus%20auritus.png",
+  "Onça-parda":           "https://github.com/brennobenk1/MamiferosDaSerraDonaFrancisca/blob/main/Ilustracoes/On%C3%A7a-parda.png",
+  "Ouriço-cacheiro":      "https://github.com/brennobenk1/MamiferosDaSerraDonaFrancisca/blob/main/Ilustracoes/Ouri%C3%A7o-cacheiro.png",
+  "Quati":                "https://github.com/brennobenk1/MamiferosDaSerraDonaFrancisca/blob/main/Ilustracoes/Quati.png",
+  "Tamanduá-mirim":       "https://github.com/brennobenk1/MamiferosDaSerraDonaFrancisca/blob/main/Ilustracoes/tamandua%20mirim.png",
+  "Veado-catingueiro":    "https://github.com/brennobenk1/MamiferosDaSerraDonaFrancisca/blob/main/Ilustracoes/Veado-catingueiro.png",
+  "Gato-do-mato-do-sul":  "https://github.com/brennobenk1/MamiferosDaSerraDonaFrancisca/blob/main/Ilustracoes/Gato-do-mato-do-sul.png",
+  "Lobo-guará":           "https://github.com/brennobenk1/MamiferosDaSerraDonaFrancisca/blob/main/Ilustracoes/Chrysocyon%20brachyurus.png",
+  "Gato-maracajá":        "",   // ← falta ilustração; cole o link do GitHub aqui
+  "Lontra":               "",   // ← falta ilustração; cole o link do GitHub aqui
+  "Ratão-do-banhado":     "",   // ← falta ilustração; cole o link do GitHub aqui
+  "Gambá-orelha-preta":   "https://github.com/brennobenk1/MamiferosDaSerraDonaFrancisca/blob/main/Ilustracoes/Didelphis%20aurita.png",
+  "Bugio-ruivo":          "",   // ← falta ilustração; cole o link do GitHub aqui
+  "Capivara":             "",   // ← falta ilustração; cole o link do GitHub aqui
+  "Cateto":               "https://github.com/brennobenk1/MamiferosDaSerraDonaFrancisca/blob/main/Ilustracoes/Cateto.png",
+  "Cutia":                "https://github.com/brennobenk1/MamiferosDaSerraDonaFrancisca/blob/main/Ilustracoes/Cutia.png",
+  "Furão-pequeno":        "",   // ← falta ilustração; cole o link do GitHub aqui
+  "Gato-do-mato":         "",   // ← falta ilustração; cole o link do GitHub aqui
+  "Gato-mourisco":        "",   // ← falta ilustração; cole o link do GitHub aqui
+  "Graxaim-do-campo":     "",   // ← falta ilustração; cole o link do GitHub aqui
+  "Onça-pintada":         "",   // ← falta ilustração; cole o link do GitHub aqui
+  "Paca":                 "https://github.com/brennobenk1/MamiferosDaSerraDonaFrancisca/blob/main/Ilustracoes/Cuniculus%20paca.png",
+  "Preá":                 "",   // ← falta ilustração; cole o link do GitHub aqui
+  "Tapiti":               "",   // ← falta ilustração; cole o link do GitHub aqui
+  "Tatu-peba":            "",   // ← falta ilustração; cole o link do GitHub aqui
+  "Zorrilho":             "https://github.com/brennobenk1/MamiferosDaSerraDonaFrancisca/blob/main/Ilustracoes/Conepatus%20chinga.png",
+};
+
+/* Converte qualquer formato de link do GitHub para o endereço
+   direto do arquivo de imagem.
+
+   A página /blob/ é HTML (com cabeçalho, botões e etc.), NÃO é a
+   imagem — usar ela num <img> não funciona. Esta função troca
+   automaticamente pelo domínio raw.githubusercontent.com, que
+   devolve o arquivo puro. Também aceita links que já venham
+   prontos, e caminhos relativos como "Ilustracoes/foo.png". */
+function toDirectImageURL(url){
+  if(!url) return null;
+  url = String(url).trim();
+  if(!url) return null;
+
+  // github.com/<dono>/<repo>/blob/<branch>/<caminho>  →  raw
+  const blob = url.match(/^https?:\/\/github\.com\/([^/]+)\/([^/]+)\/blob\/(.+)$/i);
+  if(blob){
+    return `https://raw.githubusercontent.com/${blob[1]}/${blob[2]}/${blob[3].split('?')[0]}`;
+  }
+  // .../raw/<branch>/<caminho>  →  raw
+  const rawPath = url.match(/^https?:\/\/github\.com\/([^/]+)\/([^/]+)\/raw\/(.+)$/i);
+  if(rawPath){
+    return `https://raw.githubusercontent.com/${rawPath[1]}/${rawPath[2]}/${rawPath[3].split('?')[0]}`;
+  }
+  // já é um link direto, ou um caminho relativo do próprio site
+  return url.split('?')[0];
+}
+
+/* Monta o índice a partir dos links escritos à mão acima. */
+function explicitIllustrationIndex(){
+  const map = {};
+  Object.entries(ILLUSTRATION_LINKS).forEach(([nome, link]) => {
+    const url = toDirectImageURL(link);
+    if(url) map[normalizeName(nome)] = url;
+  });
+  return new Map(Object.entries(map));
 }
 
 /* ---------- LISTA FIXA (SEMPRE FUNCIONA, SEM DEPENDER DE REDE) ----------
@@ -1426,16 +1525,15 @@ const STATIC_ILLUSTRATIONS = [
   "Conepatus chinga.png",
   "Cuniculus paca.png",
   "Cutia.png",
+  "Didelphis aurita.png",
   "Gambá-orelha-branca.png",
   "Gato-do-mato-do-sul.png",
   "Gracilinanus agilis.png",
   "Morcego-pescador.png",
   "Onça-parda.png",
-  "Paca.png",
-  "Pecari tajacu.png",
+  "Ouriço-cacheiro.png",
   "Quati.png",
   "Veado-catingueiro.png",
-  "Zorrilho.png",
   "irara.png",
   "jaguatirica.png",
   "macaco prego.png",
@@ -1717,6 +1815,13 @@ async function matchIllustrations(){
   // 1) Aplica a lista fixa IMEDIATAMENTE — não depende de rede nenhuma,
   //    então as ilustrações já conhecidas aparecem na hora, mesmo que
   //    jsDelivr e a API do GitHub estejam fora do ar ou com limite excedido.
+  // 0) PRIORIDADE MÁXIMA: os links escritos à mão em ILLUSTRATION_LINKS.
+  //    É a fonte que você controla direto no código — não depende de
+  //    rede, de listagem de pasta nem de serviço externo nenhum.
+  applyIndexToCards(explicitIllustrationIndex());
+
+  // 1) Depois, a lista fixa de nomes de arquivo, para cobrir qualquer
+  //    espécie que não tenha link explícito lá em cima.
   applyIndexToCards(staticIllustrationIndex());
 
   // 2) Em segundo plano, tenta descobrir arquivos NOVOS (que ainda não
